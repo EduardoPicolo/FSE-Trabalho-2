@@ -14,20 +14,20 @@ export const RadioCard: React.FC<RadioCardProps> = (props) => {
       <Box
         {...checkbox}
         cursor="pointer"
-        borderWidth="1px"
-        borderRadius="md"
-        boxShadow="md"
+        borderRadius="full"
+        // borderWidth="1px"
+        borderColor="blackAlpha.300"
+        boxShadow="xs"
+        px={5}
+        py={3}
         _checked={{
           bg: 'purple.500',
           color: 'white',
-          borderColor: 'white',
-          fontWeight: 'semibold'
+          fontWeight: 'medium'
         }}
         _focus={{
           boxShadow: 'none'
         }}
-        px={5}
-        py={3}
       >
         {props.children}
       </Box>
