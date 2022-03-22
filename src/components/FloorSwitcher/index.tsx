@@ -2,10 +2,8 @@ import { HStack, useRadioGroup } from '@chakra-ui/react'
 
 import { RadioCard } from '@components/RadioCard'
 
-export type Floor = string
-
 interface FloorSwitcherProps {
-  floors: Floor[]
+  floors: string[]
   onChange: (nextValue: string) => void
 }
 

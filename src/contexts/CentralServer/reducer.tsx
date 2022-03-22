@@ -1,8 +1,19 @@
-import { CentralServerType } from '.'
+import type { CentralServerType } from '.'
 
 export const stateReducer = (
-  state: CentralServerType,
-  newState: Partial<CentralServerType>
+  state: Omit<CentralServerType, 'dispatchEvent'>,
+  newState: Partial<Omit<CentralServerType, 'dispatchEvent'>>
 ) => {
-  return { ...state, ...newState }
+  return {
+    groundFloor: {
+      ...state.groundFloor,
+      ...(newState?.groundFloor ?? {}),
+      bulbs: { ...state?.groundFloor?.bulbs, ...newState?.groundFloor?.bulbs }
+    },
+    firstFloor: {
+      ...state.firstFloor,
+      ...(newState?.firstFloor ?? {}),
+      bulbs: { ...state?.firstFloor?.bulbs, ...newState?.firstFloor?.bulbs }
+    }
+  }
 }

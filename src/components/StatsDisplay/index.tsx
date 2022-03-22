@@ -30,7 +30,7 @@ export const StatsDisplay: React.FC<StatsDisplayProps> = ({
           {info ?? 'Não informado'}
         </Flex>
       </StatNumber>
-      <StatHelpText>{helpText}</StatHelpText>
+      <StatHelpText marginBottom={0}>{helpText}</StatHelpText>
     </Stat>
   )
 }

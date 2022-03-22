@@ -5,6 +5,7 @@ import { toast } from 'react-toastify'
 import { ChakraProvider } from '@chakra-ui/react'
 import { NextPageWithLayout } from 'types/next-page'
 
+import { CentralServerProvider } from '@contexts/CentralServer'
 import { BaseLayout } from '@layouts/Base'
 import { IconGradient } from '@UI/iconGradient'
 
@@ -52,23 +53,25 @@ function App({ Component, pageProps }: AppPropsWithLayout) {
       </Head>
 
       <ChakraProvider theme={theme} resetCSS>
-        <GlobalStyles />
+        <CentralServerProvider>
+          <GlobalStyles />
 
-        {/* <SWRConfig value={swrConfig}> */}
-        <NextNprogress
-          color="linear-gradient(
-                  to right,
-                  #00c3ff,
-                  #b169f3
-                )"
-          startPosition={0.4}
-          stopDelayMs={200}
-          height={4}
-          options={nextNprogressOptions}
-          showOnShallow={false}
-        />
-        {getLayout(<Component {...pageProps} />)}
-        {/* </SWRConfig> */}
+          {/* <SWRConfig value={swrConfig}> */}
+          <NextNprogress
+            color="linear-gradient(
+              to right,
+              #00c3ff,
+              #b169f3
+              )"
+            startPosition={0.4}
+            stopDelayMs={200}
+            height={4}
+            options={nextNprogressOptions}
+            showOnShallow={false}
+          />
+          {getLayout(<Component {...pageProps} />)}
+          {/* </SWRConfig> */}
+        </CentralServerProvider>
 
         <IconGradient />
       </ChakraProvider>

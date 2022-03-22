@@ -4,12 +4,12 @@ import { stateReducer } from './reducer'
 
 // import { useRequest } from '@hooks'
 
-type Sensors = {
+export type Sensors = {
   temperature: number
   humidity: number
 }
 
-type Devices = {
+export type Devices = {
   AC: boolean
   bulbs: {
     room01: boolean
@@ -20,7 +20,8 @@ type Devices = {
 
 export type CentralServerType = {
   groundFloor: Sensors & Devices
-  '1': Sensors & Devices
+  firstFloor: Sensors & Devices
+  dispatchEvent: React.Dispatch<Partial<CentralServerType>>
 }
 
 const defaultValues = {
@@ -36,7 +37,8 @@ const defaultValues = {
 
 export const CentralServerDefaultValues: CentralServerType = {
   groundFloor: defaultValues,
-  '1': defaultValues
+  firstFloor: defaultValues,
+  dispatchEvent: () => ({})
 }
 
 export const CentralServer = createContext<CentralServerType>(
@@ -44,9 +46,14 @@ export const CentralServer = createContext<CentralServerType>(
 )
 
 export const CentralServerProvider: React.FC = ({ children }) => {
-  const [state, dispatch] = useReducer(stateReducer, CentralServerDefaultValues)
+  const [state, dispatchEvent] = useReducer(stateReducer, {
+    groundFloor: defaultValues,
+    firstFloor: defaultValues
+  })
 
-  const value = useMemo(() => state, [state])
+  console.log('CentralServerProvider: ', state)
+
+  const value = useMemo(() => ({ ...state, dispatchEvent }), [state])
 
   return (
     <CentralServer.Provider value={value}>{children}</CentralServer.Provider>
