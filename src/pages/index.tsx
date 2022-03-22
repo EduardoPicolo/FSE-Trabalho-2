@@ -1,11 +1,11 @@
 import { useCallback, useState } from 'react'
 import type { NextPage } from 'next'
 import Image from 'next/image'
-import { Divider, Grid, GridItem, HStack, Text } from '@chakra-ui/react'
+import { Divider, Grid, GridItem, Text, VStack } from '@chakra-ui/react'
 
-import { AirSwitch } from '@components/AirSwitch'
+import { DevicesPanel } from '@components/DevicesPanel'
 import { Floor, FloorSwitcher } from '@components/FloorSwitcher'
-import { TemperatureDisplay } from '@components/Temperature'
+import { TemperaturePanel } from '@components/TemperaturePanel'
 
 const floors: Floor[] = ['Térreo', '1 Andar']
 
@@ -17,7 +17,7 @@ const Home: NextPage = () => {
   }, [])
 
   return (
-    <Grid gridTemplateRows="auto 1fr auto" gap={5} height="100%">
+    <Grid gridTemplateRows="auto 1fr auto" gap={8} height="100%">
       <GridItem>
         <FloorSwitcher floors={floors} onChange={handleFloorChange} />
         <Divider padding={1} borderColor="blackAlpha.300" />
@@ -26,12 +26,10 @@ const Home: NextPage = () => {
         </Text>
       </GridItem>
 
-      <GridItem>
-        <HStack alignItems="flex-start" gap={6}>
-          <TemperatureDisplay temp={undefined} />
-          <AirSwitch />
-        </HStack>
-      </GridItem>
+      <VStack alignItems="flex-start" gap={8}>
+        <TemperaturePanel />
+        <DevicesPanel />
+      </VStack>
 
       <GridItem>
         <footer>

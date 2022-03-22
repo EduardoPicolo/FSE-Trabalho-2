@@ -16,14 +16,11 @@ export const Main = styled.main`
   position: relative;
   display: grid;
   width: 100%;
-  min-height: 89vh;
+  min-height: 85vh;
   padding: 2rem;
   border-radius: 16px;
-  background: rgb(0 0 0 / 40%);
-  box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px,
-    rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-
-  box-shadow: rgba(0, 0, 0, 0.56) 0px 22px 70px 4px;
+  background: rgb(235 235 235 / 30%);
+  backdrop-filter: blur(13px);
+  -webkit-backdrop-filter: blur(13px);
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 20px 30px;
 `
