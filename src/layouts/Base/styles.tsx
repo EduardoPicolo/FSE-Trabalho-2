@@ -19,7 +19,7 @@ export const Main = styled.main`
   min-height: 89vh;
   padding: 2rem;
   border-radius: 16px;
-  background: rgb(0 0 0 / 50%);
+  background: rgb(0 0 0 / 40%);
   box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px,
     rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
   backdrop-filter: blur(12px);

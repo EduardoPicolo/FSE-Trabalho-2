@@ -6,6 +6,7 @@ import { ChakraProvider } from '@chakra-ui/react'
 import { NextPageWithLayout } from 'types/next-page'
 
 import { BaseLayout } from '@layouts/Base'
+import { IconGradient } from '@UI/iconGradient'
 
 // import { SWRConfig, SWRConfiguration } from 'swr'
 import { GlobalStyles } from '@styles/globals'
@@ -69,7 +70,7 @@ function App({ Component, pageProps }: AppPropsWithLayout) {
         {getLayout(<Component {...pageProps} />)}
         {/* </SWRConfig> */}
 
-        {/* <IconGradient /> */}
+        <IconGradient />
       </ChakraProvider>
     </>
   )
