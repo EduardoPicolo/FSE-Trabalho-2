@@ -4,5 +4,4 @@ type ReactElement = import('react').ReactElement
 
 export type NextPageWithLayout = NextPage & {
   getLayout?: (page: ReactElement) => JSX.Element
-  auth?: { roles: UserType[] }
 }

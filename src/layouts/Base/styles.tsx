@@ -16,12 +16,15 @@ export const Main = styled.main`
   position: relative;
   width: 100%;
   max-width: 1440px;
-  min-height: 75vh;
+  min-height: 90vh;
   margin: 0 auto;
+  padding: 2rem;
   border-radius: 16px;
-  background: rgb(255 255 255 / 50%);
+  background: rgb(0 0 0 / 50%);
   box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px,
     rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
-  backdrop-filter: blur(8.5px);
-  -webkit-backdrop-filter: blur(8.5px);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  box-shadow: rgba(0, 0, 0, 0.56) 0px 22px 70px 4px;
 `
