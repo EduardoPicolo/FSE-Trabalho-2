@@ -73,7 +73,7 @@ int main(int argc, char const *argv[])
         sock->connectSocket("127.0.0.1", "8080");
         // string teste = create_event("teste", "teste2", "teste3");
         // cout << teste << endl;
-        sock->sendData(create_event(argv[1], "aaa", "bbb"));
+        sock->sendData(create_event(argv[1], "", ""));
     }
     catch (Exception &e)
     {

@@ -53,30 +53,16 @@ const SocketHandler = (req: NextApiRequest, res: ExtendedNextApiResponse) => {
         // @ts-ignore
         res?.socket.server.io = io
 
-        // res.sock
         const server = res?.server as net.Server
         server?.listen(8080, function () {
           console.log('Socket is listening on port 8080')
         })
+
         server?.on('connection', (connection) => {
           connection.prependOnceListener('data', (data) => {
-            console.log('FIRST TIME SOCKET CONNECTION!!! ')
-
             const teste = JSON.parse(data?.toString()) as ServerEvent
-            console.log('TESTE: ', teste)
             connectedSockets[teste?.name] = connection
           })
-
-          //   console.log(
-          //     'Client connected\r\n',
-          //     'localAddress: ' + connection.localAddress,
-          //     ' - port: ' + connection.localPort,
-          //     '\nremoteAddress' + connection.remoteAddress,
-          //     ' - port: ' + connection.remotePort
-          //   )
-
-          connection.write('Connection accepted!!!\r\n')
-          //   connectedSockets.add(connection) // add to connections array
 
           connection.on('data', function (data) {
             console.log('Received: ' + data)
@@ -94,7 +80,10 @@ const SocketHandler = (req: NextApiRequest, res: ExtendedNextApiResponse) => {
 
           connection.on('end', function () {
             console.log('Client disconnected')
-            connectedSockets.delete(connection)
+            Object.keys(connectedSockets).forEach((key) => {
+              if (connectedSockets[key] === connection)
+                delete connectedSockets[key]
+            })
           })
         })
       } else {

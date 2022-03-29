@@ -63,6 +63,7 @@ int Singleton::getConnection()
 void Singleton::closeConnection()
 {
     cout << "Closing connection..." << endl;
+    // sendData();
     shutdown(socket_, SHUT_RDWR);
     close(socket_);
 }
