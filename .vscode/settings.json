@@ -1,0 +1,16 @@
+{
+  "files.associations": {
+    "*.tsx": "typescriptreact",
+    "thread": "cpp",
+    "system_error": "c",
+    "cjson.h": "c",
+    "cjson_utils.h": "c",
+    "string.h": "c",
+    "streambuf": "cpp",
+    "*.tcc": "cpp",
+    "chrono": "cpp",
+    "limits": "cpp",
+    "memory": "cpp",
+    "type_traits": "cpp"
+  }
+}

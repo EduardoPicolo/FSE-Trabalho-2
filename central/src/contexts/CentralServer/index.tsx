@@ -51,7 +51,7 @@ export const CentralServerProvider: React.FC = ({ children }) => {
     firstFloor: defaultValues
   })
 
-  console.log('CentralServerProvider: ', state)
+  //   console.log('CentralServerProvider: ', state)
 
   const value = useMemo(() => ({ ...state, dispatchEvent }), [state])
 
