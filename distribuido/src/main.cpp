@@ -13,6 +13,7 @@
 #include <Socket.hpp>
 #include "Exception.hpp"
 #include "EventController.hpp"
+#include "ServerConfig.hpp"
 
 using namespace std;
 
@@ -66,14 +67,14 @@ int main(int argc, char const *argv[])
     for (int i = 0; i < argc; ++i)
         cout << argv[i] << "\n";
 
+    ServerConfig config = ServerConfig(argv[1]);
+
     Singleton *sock = Singleton::getInstance();
 
     try
     {
         sock->connectSocket("127.0.0.1", "8080");
-        // string teste = create_event("teste", "teste2", "teste3");
-        // cout << teste << endl;
-        sock->sendData(create_event(argv[1], "", ""));
+        // sock->sendData(create_event(argv[1], "", ""));
     }
     catch (Exception &e)
     {
@@ -81,8 +82,6 @@ int main(int argc, char const *argv[])
         cout << "Retrying connection..." << endl;
         exit(1);
     }
-
-    // char *teste = create_monitor_with_helpers();
 
     EventController eventController = EventController();
 

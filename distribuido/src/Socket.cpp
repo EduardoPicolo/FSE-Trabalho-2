@@ -92,8 +92,6 @@ void Singleton::sendData(const char *data)
     send(socket_, data, strlen(data), 0);
 }
 
-///////
-
 int is_ready(int fd)
 {
     fd_set fdset;
