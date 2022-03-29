@@ -4,16 +4,16 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { Server } from 'socket.io'
 import { DefaultEventsMap } from 'socket.io/dist/typed-events'
 
-const connectedSockets = new Set<net.Socket>()
+const connectedSockets: Record<string, net.Socket> = {}
 
 // broadcast to all connected sockets except one
-connectedSockets.broadcast = function (data: any, except: any) {
-  for (const sock of this) {
-    if (sock !== except) {
-      sock.write(data)
-    }
-  }
-}
+// connectedSockets.broadcast = function (data: any, except: any) {
+//   for (const sock of this) {
+//     if (sock !== except) {
+//       sock.write(data)
+//     }
+//   }
+// }
 
 interface ExtendedNextApiResponse<T = any> extends NextApiResponse<T> {
   server: net.Server
@@ -38,9 +38,15 @@ const SocketHandler = (req: NextApiRequest, res: ExtendedNextApiResponse) => {
         io.on('connection', (socket) => {
           socket.on('hello', (msg) => {
             console.log('HELLO SERVER: ', msg)
+            console.log('CONNECTIONS>: ', connectedSockets)
             socket.emit('hello', 'hello FROM SERVER')
 
-            connectedSockets?.broadcast?.('TESTANDO!', 'nexiste')
+            // connectedSockets?.broadcast?.(
+            //   JSON.stringify({
+            //     data: 'CENTRAL SERVER'
+            //   }),
+            //   'nexiste'
+            // )
           })
         })
 
@@ -53,21 +59,24 @@ const SocketHandler = (req: NextApiRequest, res: ExtendedNextApiResponse) => {
           console.log('Socket is listening on port 8080')
         })
         server?.on('connection', (connection) => {
-          console.log(
-            'Client connected\r\n',
-            'localAddress: ' + connection.localAddress,
-            ' - port: ' + connection.localPort,
-            '\nremoteAddress' + connection.remoteAddress,
-            ' - port: ' + connection.remotePort
-          )
+          connection.prependOnceListener('data', (data) => {
+            console.log('FIRST TIME SOCKET CONNECTION!!! ')
+
+            const teste = JSON.parse(data?.toString()) as ServerEvent
+            console.log('TESTE: ', teste)
+            connectedSockets[teste?.name] = connection
+          })
+
+          //   console.log(
+          //     'Client connected\r\n',
+          //     'localAddress: ' + connection.localAddress,
+          //     ' - port: ' + connection.localPort,
+          //     '\nremoteAddress' + connection.remoteAddress,
+          //     ' - port: ' + connection.remotePort
+          //   )
 
           connection.write('Connection accepted!!!\r\n')
-          connectedSockets.add(connection)
-
-          connection.on('end', function () {
-            console.log('Client disconnected')
-            connectedSockets.delete(connection)
-          })
+          //   connectedSockets.add(connection) // add to connections array
 
           connection.on('data', function (data) {
             console.log('Received: ' + data)
@@ -82,6 +91,11 @@ const SocketHandler = (req: NextApiRequest, res: ExtendedNextApiResponse) => {
 
           //   connection.write('Connection accepted!!!\r\n')
           //   connection.pipe(connection)
+
+          connection.on('end', function () {
+            console.log('Client disconnected')
+            connectedSockets.delete(connection)
+          })
         })
       } else {
         console.log('Socket.io already running')
