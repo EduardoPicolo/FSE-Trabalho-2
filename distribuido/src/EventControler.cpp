@@ -13,12 +13,12 @@ void EventController::listen()
 
     while (1)
     {
-        std::string data = socket2->readData();
+        string data = socket2->readData();
         handleEvent(data.c_str());
     }
 }
 
-void EventController::handleEvent(const char *const event)
+void EventController::handleEvent(const char *event)
 {
     // std::cout << "Handle Event: " << event << std::endl;
     const cJSON *key = NULL;
@@ -35,9 +35,45 @@ void EventController::handleEvent(const char *const event)
         cJSON_Delete(event_json);
     }
 
-    key = cJSON_GetObjectItemCaseSensitive(event_json, "data");
+    key = cJSON_GetObjectItemCaseSensitive(event_json, "type");
     if (cJSON_IsString(key) && (key->valuestring != NULL))
     {
-        printf("Checking monitor \"%s\"\n", key->valuestring);
+        cout << "Received event: " << key->valuestring << endl;
     }
+}
+
+const char *EventController::createEvent(const char *from, const char *type, const char *value)
+{
+    cJSON *payload = cJSON_CreateObject();
+
+    if (cJSON_AddStringToObject(payload, "from", from) == NULL)
+    {
+        cJSON_Delete(payload);
+        exit(1);
+    }
+    if (cJSON_AddStringToObject(payload, "type", type) == NULL)
+    {
+        cJSON_Delete(payload);
+        exit(1);
+    }
+    if (cJSON_AddStringToObject(payload, "value", value) == NULL)
+    {
+        cJSON_Delete(payload);
+        exit(1);
+    }
+
+    char *event = NULL;
+    event = cJSON_Print(payload);
+    if (event == NULL)
+    {
+        fprintf(stderr, "Failed to create event payload.\n");
+    }
+
+    return event;
+}
+
+void EventController::sendEvent(const char *event)
+{
+    Singleton *socket = Singleton::getInstance();
+    socket->sendData(event);
 }

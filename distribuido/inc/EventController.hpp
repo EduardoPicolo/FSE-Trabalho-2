@@ -20,7 +20,9 @@ class EventController
 public:
     EventController();
     void listen();
-    void handleEvent(const char *const event);
+    void handleEvent(const char *event);
+    const char *createEvent(const char *from, const char *type, const char *value);
+    void sendEvent(const char *event);
 
 private:
 };
