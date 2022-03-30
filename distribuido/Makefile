@@ -1,6 +1,6 @@
 CC = gcc
 CPPC = g++
-LDFLAGS = -pthread
+LDFLAGS = -pthread -lwiringPi
 BLDDIR = .
 INCDIR = $(BLDDIR)/inc
 SRCDIR = $(BLDDIR)/src
@@ -28,3 +28,10 @@ $(OBJDIR)/%.o : $(SRCDIR)/%.c
 
 clean:
 	-rm -f $(OBJDIR)/*.o $(EXE)
+
+
+terreo:
+	./bin/bin configuracao_andar_terreo.json
+
+primeiro:
+	./bin/bin configuracao_andar_1.json
