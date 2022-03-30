@@ -16,10 +16,6 @@ app.prepare().then(() => {
   fetch('http://localhost:3000/api/socket')
   const server = net.createServer()
 
-  //   server.listen(8080, function () {
-  //     console.log('Socket is listening on port 8080')
-  //   })
-
   createServer(async (req, res) => {
     res.server = server
 

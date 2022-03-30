@@ -1,5 +1,5 @@
 interface ServerEvent {
-  name: string
+  from: string
   type: string
   value: any
 }

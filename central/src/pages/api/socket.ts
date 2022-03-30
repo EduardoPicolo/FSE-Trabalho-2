@@ -37,16 +37,16 @@ const SocketHandler = (req: NextApiRequest, res: ExtendedNextApiResponse) => {
 
         io.on('connection', (socket) => {
           socket.on('hello', (msg) => {
-            console.log('HELLO SERVER: ', msg)
-            console.log('CONNECTIONS>: ', connectedSockets)
+            // console.log('HELLO SERVER: ', msg)
+            // console.log('CONNECTIONS>: ', connectedSockets)
             socket.emit('hello', 'hello FROM SERVER')
 
-            // connectedSockets?.broadcast?.(
-            //   JSON.stringify({
-            //     data: 'CENTRAL SERVER'
-            //   }),
-            //   'nexiste'
-            // )
+            connectedSockets?.['Térreo'].write(
+              JSON.stringify({
+                type: 'lampada',
+                value: 0
+              })
+            )
           })
         })
 
@@ -54,29 +54,23 @@ const SocketHandler = (req: NextApiRequest, res: ExtendedNextApiResponse) => {
         res?.socket.server.io = io
 
         const server = res?.server as net.Server
-        server?.listen(8080, function () {
-          console.log('Socket is listening on port 8080')
+        server?.listen(10049, function () {
+          console.log('Socket is listening on port 10049')
         })
 
         server?.on('connection', (connection) => {
           connection.prependOnceListener('data', (data) => {
-            const teste = JSON.parse(data?.toString()) as ServerEvent
-            connectedSockets[teste?.name] = connection
+            console.log(data?.toString?.() + ' Connected')
+            connectedSockets[data?.toString?.()] = connection
           })
 
           connection.on('data', function (data) {
-            console.log('Received: ' + data)
-            //   connection.write('Hello FROM SERVER\r\n')
-            fetch('http://localhost:3000/api/socket?teste=teste', {
+            // console.log('Received: ' + data)
+            fetch('http://localhost:3000/api/event', {
               method: 'POST',
               body: data
             })
-            // connection.destroy() // kill client after server's response
-            // connectedSockets.broadcast(data, sock);
           })
-
-          //   connection.write('Connection accepted!!!\r\n')
-          //   connection.pipe(connection)
 
           connection.on('end', function () {
             console.log('Client disconnected')
@@ -91,13 +85,6 @@ const SocketHandler = (req: NextApiRequest, res: ExtendedNextApiResponse) => {
       }
 
       break
-    }
-
-    case 'POST': {
-      const data = JSON.parse(req.body)
-      console.log('RECEIVED: ', data)
-
-      res?.socket?.server?.io.emit('update-temperature', data)
     }
 
     default: {
