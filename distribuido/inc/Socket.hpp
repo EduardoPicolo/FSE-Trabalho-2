@@ -22,15 +22,16 @@ class Singleton
 public:
     static Singleton *getInstance();
 
-    void connectSocket(char const *ip, char const *port);
+    void connectSocket(char const *ip, int port, int retryCount = 0);
     void closeConnection();
     int getConnection();
     std::string readData();
     void sendData(const char *data);
 
 protected:
-    int socket_;
-    const char *ip_, *port_;
+    int socket_ = -1;
+    const char *ip_;
+    int port_;
 
 private:
     static Singleton *inst_; // The one, single instance

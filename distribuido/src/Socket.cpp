@@ -19,11 +19,17 @@ Singleton *Singleton::getInstance()
     return (inst_);
 }
 
-void Singleton::connectSocket(char const *ip, char const *port)
+void Singleton::connectSocket(char const *ip, int port, int retryCount)
 {
+    if (socket_ != -1)
+    {
+        Singleton::closeConnection();
+    }
+
+    cout << "Connecting to address " << ip << ':' << port << "... ";
+
     ip_ = ip;
     port_ = port;
-    cout << "ADDRESS: " << ip_ << ':' << port_ << endl;
 
     struct addrinfo hints;
     memset(&hints, 0, sizeof hints);
@@ -31,9 +37,7 @@ void Singleton::connectSocket(char const *ip, char const *port)
     hints.ai_socktype = SOCK_STREAM;
     struct addrinfo *servinfo;
 
-    // int status = getaddrinfo(ip, port,
-    //                          &hints, &servinfo);
-    getaddrinfo(ip_, port_,
+    getaddrinfo(ip, to_string(port).c_str(),
                 &hints, &servinfo);
 
     if ((socket_ = socket(servinfo->ai_family,
@@ -50,8 +54,21 @@ void Singleton::connectSocket(char const *ip, char const *port)
 
     if (connected < 0)
     {
-        throw connectionError;
-        // exit(1);
+        if (retryCount < 5)
+        {
+            cerr << "Failed." << endl;
+            retryCount++;
+            sleep(3);
+            Singleton::connectSocket(ip, port, retryCount);
+        }
+        else
+        {
+            throw connectionError;
+        }
+    }
+    else
+    {
+        cout << " ✓ Connected" << endl;
     }
 }
 
@@ -62,8 +79,6 @@ int Singleton::getConnection()
 
 void Singleton::closeConnection()
 {
-    cout << "Closing connection..." << endl;
-    // sendData();
     shutdown(socket_, SHUT_RDWR);
     close(socket_);
 }

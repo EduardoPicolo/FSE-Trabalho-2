@@ -14,10 +14,11 @@
 #include "Exception.hpp"
 #include "EventController.hpp"
 #include "ServerConfig.hpp"
+#include "wiringPi.h"
 
 using namespace std;
 
-void handle_sigint(int signum)
+void quit(int signum)
 {
     cout << "Terminating..." << endl;
     Singleton::getInstance()->closeConnection();
@@ -58,43 +59,50 @@ char *create_event(const char *name, const char *type, const char *value)
 
 int main(int argc, char const *argv[])
 {
-    signal(SIGINT, handle_sigint);
+    signal(SIGINT, quit);
 
-    cout << "You have entered " << argc
-         << " arguments:"
-         << "\n";
+    IO *io;
+    ServerConfig config = ServerConfig(argv[1], io);
+    Singleton *socket = Singleton::getInstance(); // Socket
+    EventController event = EventController();
 
-    for (int i = 0; i < argc; ++i)
-        cout << argv[i] << "\n";
+    // component aaa = io->getInputs()[0];
+    // cout << "aaa.name: " << aaa.tag << endl;
 
-    ServerConfig config = ServerConfig(argv[1]);
+    // wiringPiSetup();
+    // wiringPiISR(23, INT_EDGE_RISING, aaaa);
+    // wiringPiISR(24, INT_EDGE_RISING, bbbb);
 
-    Singleton *sock = Singleton::getInstance();
+    // while (1)
+    // {
+    //     int aaa = digitalRead(25);
+    //     cout << "aaa: " << aaa << endl;
+    //     delay(1000);
+    // }
 
     try
     {
-        sock->connectSocket("127.0.0.1", "8080");
-        // sock->sendData(create_event(argv[1], "", ""));
+        socket->connectSocket("127.0.0.1", 10049);
+        socket->sendData(config.getName().c_str()); // Identify the server after connection
     }
     catch (Exception &e)
     {
         cerr << e.what() << endl;
-        cout << "Retrying connection..." << endl;
-        exit(1);
+        quit(1);
     }
 
-    EventController eventController = EventController();
-
-    std::thread eventThread(&EventController::listen, eventController);
+    std::thread eventThread(&EventController::listen, event);
     // eventThread.detach();
 
     while (1)
     {
         cout << "MAIN" << endl;
         sleep(5);
+        event.sendEvent(event.createEvent(config.getName().c_str(), "hello", "teste"));
     }
 
     // free(teste);
+    delete io;
 
     return 0;
 }
