@@ -17,19 +17,12 @@
 #include "wiringPi.h"
 #include "Socket.hpp"
 #include "EventController.hpp"
-
-struct component
-{
-    std::string type;
-    std::string tag;
-    int gpio;
-    int state = 0;
-};
+#include "SensorWorker.hpp"
+#include "Component.hpp"
 
 class IO
 {
 public:
-    IO();
     IO(std::vector<component> inputs, std::vector<component> outputs);
     ~IO();
     std::vector<component> getInputs();
@@ -43,7 +36,7 @@ private:
     std::vector<component> inputComponents_;
     std::vector<component> outputComponents_;
 
-    auto initComponentWorker(component component);
+    // auto initComponentWorker(component component);
 
     // Receives a GPIO port number and translates to a WiringPI pin number
     int toWiringPiPin(int gpio);

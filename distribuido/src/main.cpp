@@ -11,9 +11,11 @@
 
 #include "../inc/cJSON.h"
 #include <Socket.hpp>
+#include <IO.hpp>
 #include "Exception.hpp"
 #include "EventController.hpp"
 #include "ServerConfig.hpp"
+#include <SensorWorker.hpp>
 #include "wiringPi.h"
 
 using namespace std;

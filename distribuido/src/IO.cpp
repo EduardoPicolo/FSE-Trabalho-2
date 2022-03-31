@@ -1,12 +1,6 @@
 #include "IO.hpp"
 #include <string>
 
-static int window1 = 0;
-
-IO::IO()
-{
-    event_ = EventController::getInstance();
-}
 IO::IO(std::vector<component> inputs, std::vector<component> outputs)
 {
     inputComponents_ = inputs;
@@ -23,42 +17,11 @@ std::vector<component> IO::getOutputs()
     return outputComponents_;
 }
 
-auto IO::initComponentWorker(component component)
-{
-    if (component.type == "presenca")
-    {
-        std::cout << "presenca pin: " << component.gpio << std::endl;
-        wiringPiISR(component.gpio, INT_EDGE_RISING, PresenceSensorHandler);
-    }
-    else if (component.type == "contagem")
-    {
-        // return CountEnterHandler;
-        // wiringPiISR(23, INT_EDGE_RISING, (void (*)())getComponentHandler("contagem"));
-    }
-    if (component.type == "janela")
-    {
-        int pos = component.tag.find_last_of(' ');
-        std::string tag = component.tag.substr(pos + 1, component.tag.length());
-
-        if (tag == "T01")
-        {
-
-            std::cout << "janela T01 pin: " << component.gpio << std::endl;
-            wiringPiISR(component.gpio, INT_EDGE_BOTH, []()
-                        { std::cout << "Janela T01" << std::endl; });
-        }
-        else if (tag == "T02")
-        {
-            std::cout << "janela T02 pin: " << component.gpio << std::endl;
-            wiringPiISR(component.gpio, INT_EDGE_BOTH, []()
-                        { std::cout << "Janela T02" << std::endl; });
-        }
-    }
-}
-
 void IO::initComponents()
 {
     wiringPiSetup();
+
+    SensorWorker worker = SensorWorker();
 
     for (component component : inputComponents_)
     {
@@ -67,8 +30,9 @@ void IO::initComponents()
         int initialState = digitalRead(component.gpio);
         component.state = initialState;
         event_->sendEvent(event_->createEvent(component.type.c_str(), std::to_string(initialState).c_str()));
-        IO::initComponentWorker(component);
-        sleep(1);
+        // IO::initComponentWorker(component);
+        worker.initComponentWorker(component);
+        sleep(1); // sending to many events at the same time can cause issues to the NodeJS Buffer
     }
 
     // for (int i = 0; i < outputComponents_.size(); i++)
