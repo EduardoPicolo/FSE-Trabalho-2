@@ -21,7 +21,7 @@ Singleton *Singleton::getInstance()
 
 void Singleton::connectSocket(char const *ip, int port, int retryCount)
 {
-    if (socket_ != -1)
+    if (socket_)
     {
         Singleton::closeConnection();
     }

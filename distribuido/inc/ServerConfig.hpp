@@ -1,5 +1,6 @@
 #pragma once
 
+#include <vector>
 #include <sstream>
 #include <iostream>
 #include <filesystem>
@@ -22,16 +23,17 @@ struct address
 class ServerConfig
 {
 public:
-    ServerConfig(const char *path, IO *io);
+    ServerConfig(const char *path);
     ~ServerConfig();
     std::string getConfig();
     std::string getName();
     address getAddress();
+    std::vector<component> getComponentsJSON(std::string componentType);
 
 private:
-    std::string config_;
+    cJSON *config_;
     std::string name_;
-    void getNameJSON(cJSON *config_json);
     address remoteAddress_;
+    void getNameJSON(cJSON *config_json);
     void getAddressJSON(cJSON *config_json);
 };

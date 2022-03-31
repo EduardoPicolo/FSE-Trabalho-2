@@ -4,16 +4,11 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { Server } from 'socket.io'
 import { DefaultEventsMap } from 'socket.io/dist/typed-events'
 
+import { MessageBuffer } from '@utils/MessageBuffer'
+
 const connectedSockets: Record<string, net.Socket> = {}
 
-// broadcast to all connected sockets except one
-// connectedSockets.broadcast = function (data: any, except: any) {
-//   for (const sock of this) {
-//     if (sock !== except) {
-//       sock.write(data)
-//     }
-//   }
-// }
+const received = new MessageBuffer('\n')
 
 interface ExtendedNextApiResponse<T = any> extends NextApiResponse<T> {
   server: net.Server
@@ -65,7 +60,16 @@ const SocketHandler = (req: NextApiRequest, res: ExtendedNextApiResponse) => {
           })
 
           connection.on('data', function (data) {
-            // console.log('Received: ' + data)
+            console.log('Received event: ' + data)
+            // received.push(data)
+
+            // while (!received.isFinished()) {
+            //   const message = received.handleData()
+            //   console.log(JSON.parse(message))
+            // }
+
+            // console.log('AFTER: ', received.getMessage())
+
             fetch('http://localhost:3000/api/event', {
               method: 'POST',
               body: data
@@ -73,10 +77,11 @@ const SocketHandler = (req: NextApiRequest, res: ExtendedNextApiResponse) => {
           })
 
           connection.on('end', function () {
-            console.log('Client disconnected')
-            Object.keys(connectedSockets).forEach((key) => {
-              if (connectedSockets[key] === connection)
-                delete connectedSockets[key]
+            Object.keys(connectedSockets).forEach((socket) => {
+              if (connectedSockets[socket] === connection) {
+                console.log(`${socket} disconnected`)
+                delete connectedSockets[socket]
+              }
             })
           })
         })

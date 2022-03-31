@@ -25,46 +25,22 @@ void quit(int signum)
     exit(0);
 }
 
-// NOTE: Returns a heap allocated string, you are required to free it after use.
-char *create_event(const char *name, const char *type, const char *value)
-{
-    char *string = NULL;
-    size_t index = 0;
-    cJSON *payload = cJSON_CreateObject();
-
-    if (cJSON_AddStringToObject(payload, "name", name) == NULL)
-    {
-        cJSON_Delete(payload);
-        return string;
-    }
-    if (cJSON_AddStringToObject(payload, "type", type) == NULL)
-    {
-        cJSON_Delete(payload);
-        return string;
-    }
-    if (cJSON_AddStringToObject(payload, "value", value) == NULL)
-    {
-        cJSON_Delete(payload);
-        return string;
-    }
-
-    string = cJSON_Print(payload);
-    if (string == NULL)
-    {
-        fprintf(stderr, "Failed to print monitor.\n");
-    }
-
-    return string;
-}
-
 int main(int argc, char const *argv[])
 {
     signal(SIGINT, quit);
 
-    IO *io;
-    ServerConfig config = ServerConfig(argv[1], io);
+    ServerConfig config = ServerConfig(argv[1]);
+
     Singleton *socket = Singleton::getInstance(); // Socket
-    EventController event = EventController();
+
+    // initComponents can not send event because socket is not connected
+    // IO io = IO(config.getComponentsJSON("inputs"), config.getComponentsJSON("outputs"));
+    // io.initComponents();
+
+    // while (1)
+    // {
+    //     sleep(10);
+    // }
 
     // component aaa = io->getInputs()[0];
     // cout << "aaa.name: " << aaa.tag << endl;
@@ -84,6 +60,7 @@ int main(int argc, char const *argv[])
     {
         socket->connectSocket("127.0.0.1", 10049);
         socket->sendData(config.getName().c_str()); // Identify the server after connection
+        sleep(2);                                   // Wait for the server to identify
     }
     catch (Exception &e)
     {
@@ -91,18 +68,23 @@ int main(int argc, char const *argv[])
         quit(1);
     }
 
+    EventController *event = EventController::getInstance();
+    event->setHostName(config.getName());
     std::thread eventThread(&EventController::listen, event);
     // eventThread.detach();
+
+    IO io = IO(config.getComponentsJSON("inputs"), config.getComponentsJSON("outputs"));
+    io.initComponents();
 
     while (1)
     {
         cout << "MAIN" << endl;
-        sleep(5);
-        event.sendEvent(event.createEvent(config.getName().c_str(), "hello", "teste"));
+        sleep(7);
+        event->sendEvent(event->createEvent("hello", "teste"));
     }
 
     // free(teste);
-    delete io;
+    // delete io;
 
     return 0;
 }

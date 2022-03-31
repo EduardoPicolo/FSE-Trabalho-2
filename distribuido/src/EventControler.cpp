@@ -5,15 +5,30 @@
 
 using namespace std;
 
-EventController::EventController() {}
+EventController::EventController()
+{
+    socket_ = Singleton::getInstance();
+}
+
+// Define the static Singleton pointer
+EventController *EventController::inst_ = NULL;
+
+EventController *EventController::getInstance()
+{
+    if (inst_ == NULL)
+    {
+        inst_ = new EventController();
+    }
+    return (inst_);
+}
 
 void EventController::listen()
 {
-    Singleton *socket2 = Singleton::getInstance();
+    // Singleton *socket2 = Singleton::getInstance();
 
     while (1)
     {
-        string data = socket2->readData();
+        string data = socket_->readData();
         handleEvent(data.c_str());
     }
 }
@@ -42,11 +57,11 @@ void EventController::handleEvent(const char *event)
     }
 }
 
-const char *EventController::createEvent(const char *from, const char *type, const char *value)
+const char *EventController::createEvent(const char *type, const char *value)
 {
     cJSON *payload = cJSON_CreateObject();
 
-    if (cJSON_AddStringToObject(payload, "from", from) == NULL)
+    if (cJSON_AddStringToObject(payload, "from", hostName_) == NULL)
     {
         cJSON_Delete(payload);
         exit(1);
@@ -69,11 +84,18 @@ const char *EventController::createEvent(const char *from, const char *type, con
         fprintf(stderr, "Failed to create event payload.\n");
     }
 
+    cJSON_Delete(payload);
+    event += '\n';
     return event;
 }
 
 void EventController::sendEvent(const char *event)
 {
-    Singleton *socket = Singleton::getInstance();
-    socket->sendData(event);
+    // Singleton *socket = Singleton::getInstance();
+    socket_->sendData(event);
+}
+
+void EventController::setHostName(std::string hostName)
+{
+    hostName_ = hostName.c_str();
 }

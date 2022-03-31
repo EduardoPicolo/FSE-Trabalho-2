@@ -17,11 +17,11 @@ void ServerConfig::getAddressJSON(cJSON *config_json)
     remoteAddress_.port = port_json->valueint;
 }
 
-std::vector<component> getComponentsJSON(cJSON *config_json, std::string componentType)
+std::vector<component> ServerConfig::getComponentsJSON(std::string componentType)
 {
     std::vector<component> components;
 
-    cJSON *component_json = cJSON_GetObjectItem(config_json, componentType.c_str());
+    cJSON *component_json = cJSON_GetObjectItem(config_, componentType.c_str());
 
     for (int i = 0; i < cJSON_GetArraySize(component_json); i++)
     {
@@ -30,6 +30,7 @@ std::vector<component> getComponentsJSON(cJSON *config_json, std::string compone
         tempComponent.type = cJSON_GetObjectItem(data, "type")->valuestring;
         tempComponent.tag = cJSON_GetObjectItem(data, "tag")->valuestring;
         tempComponent.gpio = cJSON_GetObjectItem(data, "gpio")->valueint;
+        tempComponent.state = 0;
 
         components.push_back(tempComponent);
     }
@@ -37,7 +38,7 @@ std::vector<component> getComponentsJSON(cJSON *config_json, std::string compone
     return components;
 }
 
-ServerConfig::ServerConfig(const char *path, IO *io)
+ServerConfig::ServerConfig(const char *path)
 {
     std::ifstream fs;
     fs.open(path);
@@ -48,16 +49,10 @@ ServerConfig::ServerConfig(const char *path, IO *io)
         buffer << fs.rdbuf();
 
         cJSON *config_json = cJSON_Parse(buffer.str().c_str());
-
-        std::string ss = cJSON_Print(config_json);
-        config_ == ss;
+        config_ = config_json;
 
         getNameJSON(config_json);
         getAddressJSON(config_json);
-
-        getComponentsJSON(config_json, "inputs");
-
-        io = new IO(getComponentsJSON(config_json, "inputs"), getComponentsJSON(config_json, "outputs"));
 
         cout << "Config file loaded" << endl;
     }
