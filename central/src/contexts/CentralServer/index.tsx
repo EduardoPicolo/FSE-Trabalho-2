@@ -12,8 +12,16 @@ import { ACTIONS, stateReducer, UpdateDeviceAction } from './reducer'
 type Status = boolean | number | 'pending'
 
 export type Sensors = {
+  occupation: number
   temperature: Status
   humidity: Status
+  presence: Status
+  smoke: Status
+  door: Status
+  windows: {
+    room1: Status
+    room2: Status
+  }
 }
 
 export type Devices = {
@@ -23,13 +31,12 @@ export type Devices = {
     room02: Status
     corridor: Status
   }
-  windows: {
-    room1: Status
-    room2: Status
-  }
+  sprinkler: Status
 }
 
-export type FloorComponents = Sensors & Devices & { connected: boolean }
+export type FloorComponents = Devices & { sensors: Sensors } & {
+  connected: boolean
+}
 
 export type CentralServerType = {
   //   groundFloor: FloorComponents
@@ -41,21 +48,29 @@ export type CentralServerType = {
   currentFloor: string | null
   setCurrentFloor: (floor: string | null) => void
   updateDevice: (payload: UpdateDeviceAction['payload']) => void
+  handleEvent: (event: ServerEvent) => void
 }
 
 const defaultValues = {
   connected: false,
-  temperature: 'pending',
-  humidity: 'pending',
+  occupation: 0,
   AC: 'pending',
+  sprinkler: 'pending',
   bulbs: {
     room01: 'pending',
     room02: 'pending',
     corridor: 'pending'
   },
-  windows: {
-    room1: 'pending',
-    room2: 'pending'
+  sensors: {
+    temperature: 'pending',
+    humidity: 'pending',
+    presence: 'pending',
+    smoke: 'pending',
+    door: 'pending',
+    windows: {
+      room1: 'pending',
+      room2: 'pending'
+    }
   }
 }
 
@@ -66,7 +81,8 @@ export const CentralServerDefaultValues: CentralServerType = {
   getFloors: [],
   currentFloor: null,
   setCurrentFloor: () => ({}),
-  updateDevice: () => ({})
+  updateDevice: () => ({}),
+  handleEvent: () => ({})
 }
 
 export const CentralServer = createContext<CentralServerType>(
@@ -74,29 +90,36 @@ export const CentralServer = createContext<CentralServerType>(
 )
 
 export const CentralServerProvider: React.FC = ({ children }) => {
-  const [state, dispatchEvent] = useReducer(stateReducer, {
-    floors: {}
-  })
   //   const [state, dispatchEvent] = useReducer(stateReducer, {
-  //     floors: {
-  //       Térreo: {
-  //         connected: false,
-  //         temperature: true,
-  //         humidity: true,
-  //         AC: true,
-  //         bulbs: {
-  //           room01: true,
-  //           room02: false,
-  //           corridor: false
-  //         },
-  //         windows: {
-  //           room1: true,
-  //           room2: true
-  //         }
-  //       } as any,
-  //       '1oAndar': defaultValues as any
-  //     }
+  //     floors: {}
   //   })
+  const [state, dispatchEvent] = useReducer(stateReducer, {
+    floors: {
+      Térreo: {
+        connected: false,
+        occupation: 0,
+        AC: true,
+        sprinkler: false,
+        bulbs: {
+          room01: true,
+          room02: false,
+          corridor: false
+        },
+        sensors: {
+          temperature: true,
+          humidity: true,
+          presence: false,
+          smoke: false,
+          door: true,
+          windows: {
+            room1: true,
+            room2: true
+          }
+        }
+      } as any,
+      '1oAndar': defaultValues as any
+    }
+  })
 
   const getFloors = useMemo(() => Object.keys(state.floors), [state.floors])
 
@@ -130,6 +153,49 @@ export const CentralServerProvider: React.FC = ({ children }) => {
     })
   }, [])
 
+  const handleEvent = useCallback(
+    ({ from, type, value }: ServerEvent) => {
+      const payload = {
+        floor: from,
+        device: '',
+        status: Boolean(Number(value))
+      }
+
+      switch (type) {
+        // case 'temperatura':
+        //   payload.device = 'sensors.temperature'
+        //   break
+        // case 'umidade':
+        //   payload.device = 'sensors.humidity'
+        //   break
+        case 'presenca':
+          payload.device = 'sensors.presence'
+          break
+        case 'fumaca':
+          payload.device = 'sensors.smoke'
+
+          if (value === '1')
+            updateDevice({ floor: from, device: 'sprinkler', status: true })
+
+          break
+        case 'janela 01':
+          payload.device = 'sensors.windows.room1'
+          break
+        case 'janela 02':
+          payload.device = 'sensors.windows.room2'
+          break
+        case 'porta':
+          payload.device = 'sensors.door'
+          break
+        default:
+          break
+      }
+
+      updateDevice(payload)
+    },
+    [updateDevice]
+  )
+
   const value = useMemo(
     () => ({
       ...state,
@@ -138,9 +204,18 @@ export const CentralServerProvider: React.FC = ({ children }) => {
       removeFloor,
       currentFloor,
       setCurrentFloor,
-      updateDevice
+      updateDevice,
+      handleEvent
     }),
-    [addFloor, currentFloor, getFloors, removeFloor, state, updateDevice]
+    [
+      addFloor,
+      currentFloor,
+      getFloors,
+      handleEvent,
+      removeFloor,
+      state,
+      updateDevice
+    ]
   )
 
   return (

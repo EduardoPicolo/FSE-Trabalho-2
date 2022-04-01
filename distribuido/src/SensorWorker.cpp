@@ -31,21 +31,16 @@ void SensorWorker::initComponentWorker(component component)
         // return CountEnterHandler;
         // wiringPiISR(23, INT_EDGE_BOTH, (void (*)())getComponentHandler("contagem"));
     }
-    if (component.type == "janela")
+    if (component.type.find("janela") != std::string::npos)
     {
-        int pos = component.tag.find_last_of(' ');
-        std::string tag = component.tag.substr(pos + 2, component.tag.length());
-
-        if (tag == "01")
+        if (component.tag.find("01") != std::string::npos)
         {
             window01_ = component.state;
-            // std::cout << "janela 01 pin: " << component.gpio << std::endl;
             wiringPiISR(component.gpio, INT_EDGE_BOTH, Window01Handler);
         }
-        else if (tag == "02")
+        else if (component.tag.find("02") != std::string::npos)
         {
             window02_ = component.state;
-            // std::cout << "janela 02 pin: " << component.gpio << std::endl;
             wiringPiISR(component.gpio, INT_EDGE_BOTH, Window02Handler);
         }
     }

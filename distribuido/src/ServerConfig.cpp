@@ -28,7 +28,15 @@ std::vector<component> ServerConfig::getComponentsJSON(std::string componentType
         cJSON *data = cJSON_GetArrayItem(component_json, i);
         struct component tempComponent;
         tempComponent.type = cJSON_GetObjectItem(data, "type")->valuestring;
-        tempComponent.tag = cJSON_GetObjectItem(data, "tag")->valuestring;
+
+        std::string tag = cJSON_GetObjectItem(data, "tag")->valuestring;
+        if (tempComponent.type == "janela")
+        {
+            int pos = tag.find_last_of(' ');
+            tempComponent.type += ' ' + tag.substr(pos + 2, tag.length());
+        }
+
+        tempComponent.tag = tag;
         tempComponent.gpio = cJSON_GetObjectItem(data, "gpio")->valueint;
         tempComponent.state = 0;
 
