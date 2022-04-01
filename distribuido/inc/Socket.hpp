@@ -17,12 +17,12 @@
 
 #include "cJSON.h"
 
-class Singleton
+class Socket
 {
 public:
-    static Singleton *getInstance();
+    static Socket *getInstance();
 
-    void connectSocket(char const *ip, int port, int retryCount = 0);
+    void connectSocket(char const *ip, int port);
     void closeConnection();
     int getConnection();
     std::string readData();
@@ -34,8 +34,8 @@ protected:
     int port_;
 
 private:
-    static Singleton *inst_; // The one, single instance
-    Singleton();
-    Singleton(const Singleton &);
-    Singleton &operator=(const Singleton &);
+    static Socket *inst_; // The one, single instance
+    Socket();
+    Socket(const Socket &);
+    Socket &operator=(const Socket &);
 };

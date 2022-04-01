@@ -29,7 +29,7 @@ public:
     void sendEvent(const char *event);
 
 protected:
-    Singleton *socket_;
+    Socket *socket_;
     const char *hostName_;
 
 private:

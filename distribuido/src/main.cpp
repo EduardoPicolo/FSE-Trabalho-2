@@ -23,7 +23,7 @@ using namespace std;
 void quit(int signum)
 {
     cout << "Terminating..." << endl;
-    Singleton::getInstance()->closeConnection();
+    Socket::getInstance()->closeConnection();
     exit(0);
 }
 
@@ -33,30 +33,11 @@ int main(int argc, char const *argv[])
 
     ServerConfig config = ServerConfig(argv[1]);
 
-    Singleton *socket = Singleton::getInstance(); // Socket
+    Socket *socket = Socket::getInstance(); // Socket
 
     // initComponents can not send event because socket is not connected
     // IO io = IO(config.getComponentsJSON("inputs"), config.getComponentsJSON("outputs"));
     // io.initComponents();
-
-    // while (1)
-    // {
-    //     sleep(10);
-    // }
-
-    // component aaa = io->getInputs()[0];
-    // cout << "aaa.name: " << aaa.tag << endl;
-
-    // wiringPiSetup();
-    // wiringPiISR(23, INT_EDGE_RISING, aaaa);
-    // wiringPiISR(24, INT_EDGE_RISING, bbbb);
-
-    // while (1)
-    // {
-    //     int aaa = digitalRead(25);
-    //     cout << "aaa: " << aaa << endl;
-    //     delay(1000);
-    // }
 
     try
     {
@@ -81,12 +62,9 @@ int main(int argc, char const *argv[])
     while (1)
     {
         cout << "MAIN" << endl;
-        sleep(7);
+        sleep(10);
         event->sendEvent(event->createEvent("hello", "teste"));
     }
-
-    // free(teste);
-    // delete io;
 
     return 0;
 }

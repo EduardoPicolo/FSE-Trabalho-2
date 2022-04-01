@@ -7,10 +7,10 @@ using namespace std;
 
 EventController::EventController()
 {
-    socket_ = Singleton::getInstance();
+    socket_ = Socket::getInstance();
 }
 
-// Define the static Singleton pointer
+// Define the static Socket pointer
 EventController *EventController::inst_ = NULL;
 
 EventController *EventController::getInstance()
@@ -24,8 +24,6 @@ EventController *EventController::getInstance()
 
 void EventController::listen()
 {
-    // Singleton *socket2 = Singleton::getInstance();
-
     while (1)
     {
         string data = socket_->readData();
@@ -91,7 +89,7 @@ const char *EventController::createEvent(const char *type, const char *value)
 
 void EventController::sendEvent(const char *event)
 {
-    // Singleton *socket = Singleton::getInstance();
+    // Socket *socket = Socket::getInstance();
     socket_->sendData(event);
 }
 

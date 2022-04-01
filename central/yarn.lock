@@ -2807,7 +2807,7 @@ react-remove-scroll-bar@^2.1.0:
   resolved "https://registry.yarnpkg.com/react-remove-scroll-bar/-/react-remove-scroll-bar-2.2.0.tgz#d4d545a7df024f75d67e151499a6ab5ac97c8cdd"
   integrity sha512-UU9ZBP1wdMR8qoUs7owiVcpaPwsQxUDC2lypP6mmixaGlARZa7ZIBx1jcuObLdhMOvCsnZcvetOho0wzPa9PYg==
   dependencies:
-    react-style-singleton "^2.1.0"
+    react-style-Socket "^2.1.0"
     tslib "^1.0.0"
 
 react-remove-scroll@2.4.1:
@@ -2816,14 +2816,14 @@ react-remove-scroll@2.4.1:
   integrity sha512-K7XZySEzOHMTq7dDwcHsZA6Y7/1uX5RsWhRXVYv8rdh+y9Qz2nMwl9RX/Mwnj/j7JstCGmxyfyC0zbVGXYh3mA==
   dependencies:
     react-remove-scroll-bar "^2.1.0"
-    react-style-singleton "^2.1.0"
+    react-style-Socket "^2.1.0"
     tslib "^1.0.0"
     use-callback-ref "^1.2.3"
     use-sidecar "^1.0.1"
 
-react-style-singleton@^2.1.0:
+react-style-Socket@^2.1.0:
   version "2.1.1"
-  resolved "https://registry.yarnpkg.com/react-style-singleton/-/react-style-singleton-2.1.1.tgz#ce7f90b67618be2b6b94902a30aaea152ce52e66"
+  resolved "https://registry.yarnpkg.com/react-style-Socket/-/react-style-Socket-2.1.1.tgz#ce7f90b67618be2b6b94902a30aaea152ce52e66"
   integrity sha512-jNRp07Jza6CBqdRKNgGhT3u9umWvils1xsuMOjZlghBDH2MU0PL2WZor4PGYjXpnRCa9DQSlHMs/xnABWOwYbA==
   dependencies:
     get-nonce "^1.0.0"

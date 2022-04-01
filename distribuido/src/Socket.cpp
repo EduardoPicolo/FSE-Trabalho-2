@@ -3,30 +3,28 @@
 
 using namespace std;
 
-Singleton::Singleton()
+Socket::Socket()
 {
 }
 
-// Define the static Singleton pointer
-Singleton *Singleton::inst_ = NULL;
+// Define the static Socket pointer
+Socket *Socket::inst_ = NULL;
 
-Singleton *Singleton::getInstance()
+Socket *Socket::getInstance()
 {
     if (inst_ == NULL)
     {
-        inst_ = new Singleton();
+        inst_ = new Socket();
     }
     return (inst_);
 }
 
-void Singleton::connectSocket(char const *ip, int port, int retryCount)
+void Socket::connectSocket(char const *ip, int port)
 {
     if (socket_)
     {
-        Singleton::closeConnection();
+        Socket::closeConnection();
     }
-
-    cout << "Connecting to address " << ip << ':' << port << "... ";
 
     ip_ = ip;
     port_ = port;
@@ -48,42 +46,32 @@ void Singleton::connectSocket(char const *ip, int port, int retryCount)
         exit(1);
     }
 
-    int connected = connect(socket_,
-                            servinfo->ai_addr,
-                            servinfo->ai_addrlen);
+    cout << "Connecting to " << ip << ':' << port << "... ";
 
-    if (connected < 0)
+    while (connect(socket_,
+                   servinfo->ai_addr,
+                   servinfo->ai_addrlen) < 0)
     {
-        if (retryCount < 5)
-        {
-            cerr << "Failed." << endl;
-            retryCount++;
-            sleep(3);
-            Singleton::connectSocket(ip, port, retryCount);
-        }
-        else
-        {
-            throw connectionError;
-        }
+        cerr << "Failed." << endl;
+        sleep(3);
+        cout << "Connecting to " << ip << ':' << port << "... ";
     }
-    else
-    {
-        cout << " ✓ Connected" << endl;
-    }
+
+    cout << " ✓ Connected" << endl;
 }
 
-int Singleton::getConnection()
+int Socket::getConnection()
 {
     return socket_;
 }
 
-void Singleton::closeConnection()
+void Socket::closeConnection()
 {
     shutdown(socket_, SHUT_RDWR);
     close(socket_);
 }
 
-std::string Singleton::readData()
+std::string Socket::readData()
 {
     int bytes = 0;
     char buffer[1024] = {0};
@@ -102,7 +90,7 @@ std::string Singleton::readData()
     return data;
 }
 
-void Singleton::sendData(const char *data)
+void Socket::sendData(const char *data)
 {
     send(socket_, data, strlen(data), 0);
 }
