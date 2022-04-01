@@ -2,24 +2,31 @@ import React, { useCallback } from 'react'
 import { MdOutlineAir } from 'react-icons/md'
 import { RiLightbulbFlashLine } from 'react-icons/ri'
 import { Box, Wrap, WrapItem } from '@chakra-ui/react'
+import get from 'lodash/get'
 
 import { StatsDisplay } from '@components/StatsDisplay'
 import { SwitchDevice } from '@components/Switch'
-import { Floor } from '@constants/floors'
 import { useCServer } from '@contexts/CentralServer'
-
-interface DevicesPanelProps {
-  floor: Floor
-}
 
 const statusMap = (status: boolean) => (status ? 'Ligada' : 'Desligada')
 
-export const DevicesPanel: React.FC<DevicesPanelProps> = ({ floor }) => {
-  const { dispatchEvent, ...status } = useCServer()
+export const DevicesPanel: React.FC = () => {
+  const { currentFloor, floors } = useCServer()
 
   const handleChange = useCallback(
-    (payload) => () => dispatchEvent({ [floor]: payload }),
-    [dispatchEvent, floor]
+    (payload) => () => console.log('TODO: handleChange', payload),
+    []
+  )
+
+  const deviceStatus = useCallback(
+    (device: string) => {
+      if (!currentFloor) return false
+
+      const status = get(floors, `${currentFloor}.${device}`, false) as unknown
+
+      return status
+    },
+    [currentFloor, floors]
   )
 
   return (
@@ -31,70 +38,74 @@ export const DevicesPanel: React.FC<DevicesPanelProps> = ({ floor }) => {
             <Box my={2}>
               <SwitchDevice
                 label=""
-                isChecked={status?.[floor]?.AC}
-                onChange={handleChange({ AC: !status?.[floor]?.AC })}
+                isChecked={deviceStatus('AC') === true}
+                onChange={handleChange({})}
               />
             </Box>
           }
-          helpText={status?.[floor]?.AC ? 'Ligado' : 'Desligado'}
+          helpText={deviceStatus('bulbs.room01') ? 'Ligado' : 'Desligado'}
           icon={MdOutlineAir}
+          isLoaded={typeof deviceStatus('AC') === 'boolean'}
         />
       </WrapItem>
 
       <WrapItem>
         <StatsDisplay
-          label="Lâmpada da Sala T01"
+          label="Lâmpada da Sala 01"
           info={
             <Box my={2}>
               <SwitchDevice
                 label=""
-                isChecked={status?.[floor]?.bulbs.room01}
+                isChecked={deviceStatus('bulbs.room01') === true}
                 onChange={handleChange({
-                  bulbs: { room01: !status?.[floor]?.bulbs.room01 }
+                  //   bulbs: { room01: !status?.[floor]?.bulbs.room01 }
                 })}
               />
             </Box>
           }
-          helpText={statusMap(status?.[floor]?.bulbs.room01)}
+          helpText={statusMap(deviceStatus('bulbs.room01'))}
           icon={RiLightbulbFlashLine}
+          isLoaded={typeof deviceStatus('bulbs.room01') === 'boolean'}
         />
       </WrapItem>
 
       <WrapItem>
         <StatsDisplay
-          label="Lâmpada da Sala T02"
+          label="Lâmpada da Sala 02"
           info={
             <Box my={2}>
               <SwitchDevice
                 label=""
-                isChecked={status?.[floor]?.bulbs.room02}
+                isChecked={deviceStatus('bulbs.room02') === true}
                 onChange={handleChange({
-                  bulbs: { room02: !status?.[floor]?.bulbs.room02 }
+                  //   bulbs: { room02: !status?.[floor]?.bulbs.room02 }
                 })}
               />
             </Box>
           }
-          helpText={statusMap(status?.[floor]?.bulbs.room02)}
+          helpText={statusMap(deviceStatus('bulbs.room02'))}
           icon={RiLightbulbFlashLine}
+          isLoaded={typeof deviceStatus('bulbs.room02') === 'boolean'}
         />
       </WrapItem>
 
       <WrapItem>
         <StatsDisplay
-          label="Lâmpadas do Corredor Terreo"
+          label="Lâmpadas do Corredor"
           info={
             <Box my={2}>
               <SwitchDevice
                 label=""
-                isChecked={status?.[floor]?.bulbs.corridor}
+                isChecked={deviceStatus('bulbs.corridor') === true}
                 onChange={handleChange({
-                  bulbs: { corridor: !status?.[floor]?.bulbs.corridor }
+                  //   bulbs: { corridor: !status?.[floor]?.bulbs.corridor }
                 })}
               />
             </Box>
           }
-          helpText={statusMap(status?.[floor]?.bulbs.corridor)}
+          helpText={statusMap(deviceStatus('bulbs.corridor'))}
           icon={RiLightbulbFlashLine}
+          isLoaded={typeof deviceStatus('bulbs.corridor') === 'boolean'}
         />
       </WrapItem>
     </Wrap>

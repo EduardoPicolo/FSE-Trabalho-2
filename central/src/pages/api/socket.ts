@@ -57,6 +57,20 @@ const SocketHandler = (req: NextApiRequest, res: ExtendedNextApiResponse) => {
           connection.prependOnceListener('data', (data) => {
             console.log(data?.toString?.() + ' Connected')
             connectedSockets[data?.toString?.()] = connection
+
+            // fetch('http://localhost:3000/api/event', {
+            //   method: 'POST',
+            //   body: JSON.stringify({
+            // from: data?.toString?.(),
+            // type: 'connection',
+            // value: 1
+            //   })
+            // })
+            io.emit('connection', {
+              from: data?.toString?.(),
+              type: 'connection',
+              value: 1
+            })
           })
 
           connection.on('data', function (data) {
@@ -80,6 +94,19 @@ const SocketHandler = (req: NextApiRequest, res: ExtendedNextApiResponse) => {
             Object.keys(connectedSockets).forEach((socket) => {
               if (connectedSockets[socket] === connection) {
                 console.log(`${socket} disconnected`)
+                // fetch('http://localhost:3000/api/event', {
+                //   method: 'POST',
+                //   body: JSON.stringify({
+                //     from: socket,
+                //     type: 'connection',
+                //     value: 0
+                //   })
+                // })
+                io.emit('connection', {
+                  from: socket,
+                  type: 'connection',
+                  value: 0
+                })
                 delete connectedSockets[socket]
               }
             })

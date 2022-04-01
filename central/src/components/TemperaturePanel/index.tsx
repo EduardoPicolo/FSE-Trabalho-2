@@ -4,15 +4,11 @@ import { RiTempColdLine } from 'react-icons/ri'
 import { HStack } from '@chakra-ui/react'
 
 import { StatsDisplay } from '@components/StatsDisplay'
-import { Floor } from '@constants/floors'
+import { useCServer } from '@contexts/CentralServer'
 
-interface TemperaturePanelProps {
-  floor: Floor
-}
+export const TemperaturePanel: React.FC<TemperaturePanelProps> = () => {
+  const { currentFloor } = useCServer()
 
-export const TemperaturePanel: React.FC<TemperaturePanelProps> = ({
-  floor
-}) => {
   return (
     <HStack alignItems="flex-start" gap={8}>
       <StatsDisplay

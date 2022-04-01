@@ -27,7 +27,7 @@ const SocketHandler = (req: NextApiRequest, res: ExtendedNextApiResponse) => {
         res.status(400).send('Invalid event')
       }
 
-      res?.socket?.server?.io.emit('update-temperature', data)
+      res?.socket?.server?.io.emit('event', data)
     }
 
     default: {

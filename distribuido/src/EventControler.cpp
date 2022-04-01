@@ -85,7 +85,7 @@ const char *EventController::createEvent(const char *type, const char *value)
     }
 
     cJSON_Delete(payload);
-    event += '\n';
+    // std::cout << "Event: " << event << std::endl;
     return event;
 }
 
