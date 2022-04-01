@@ -9,21 +9,14 @@ import { CentralServerProvider } from '@contexts/CentralServer'
 import { BaseLayout } from '@layouts/Base'
 import { IconGradient } from '@UI/iconGradient'
 
-// import { SWRConfig, SWRConfiguration } from 'swr'
 import { GlobalStyles } from '@styles/globals'
 import { theme } from '@styles/theme'
-// import { theme } from '@styles/theme'
 import 'react-loading-skeleton/dist/skeleton.css'
 import 'react-toastify/dist/ReactToastify.css'
 
 type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout
 }
-
-// const swrConfig: SWRConfiguration = {
-//   revalidateOnFocus: process.env.NODE_ENV !== 'development',
-//   shouldRetryOnError: false
-// }
 
 const nextNprogressOptions = {
   showSpinner: false
@@ -32,14 +25,6 @@ const nextNprogressOptions = {
 toast.configure({
   autoClose: 4000,
   position: 'top-right'
-})
-
-toast.configure({
-  position: 'bottom-center',
-  autoClose: false,
-  closeButton: false,
-  enableMultiContainer: true,
-  containerId: 'fetch-error'
 })
 
 function App({ Component, pageProps }: AppPropsWithLayout) {
@@ -56,7 +41,6 @@ function App({ Component, pageProps }: AppPropsWithLayout) {
         <CentralServerProvider>
           <GlobalStyles />
 
-          {/* <SWRConfig value={swrConfig}> */}
           <NextNprogress
             color="linear-gradient(
               to right,
@@ -70,7 +54,6 @@ function App({ Component, pageProps }: AppPropsWithLayout) {
             showOnShallow={false}
           />
           {getLayout(<Component {...pageProps} />)}
-          {/* </SWRConfig> */}
         </CentralServerProvider>
 
         <IconGradient />

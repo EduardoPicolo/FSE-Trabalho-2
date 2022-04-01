@@ -1,15 +1,17 @@
 // import { Socket } from 'net'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect } from 'react'
 import type { NextPage } from 'next'
 import { IoIosPeople } from 'react-icons/io'
+import { toast } from 'react-toastify'
 import {
   Box,
-  Button,
   Divider,
   Flex,
   Grid,
   GridItem,
+  Progress,
+  Skeleton,
   Text,
   VStack
 } from '@chakra-ui/react'
@@ -18,49 +20,23 @@ import { io, Socket } from 'socket.io-client'
 
 import { DevicesPanel } from '@components/DevicesPanel'
 import { FloorSwitcher } from '@components/FloorSwitcher'
+import { Modal } from '@components/Modal'
 import { StatsDisplay } from '@components/StatsDisplay'
 import { TemperaturePanel } from '@components/TemperaturePanel'
-import { floors, floorsMap } from '@constants/floors'
-// import net from 'net'
-
-// export const getServerSideProps: GetServerSideProps = async () => {
-//   const net = await import('net').then((mod) => mod)
-
-//   const client = new net.Socket()
-//   client.connect(8080, '127.0.0.1', function () {
-//     console.log('Connected')
-//     client.write('Hello, server! Love, Client.')
-//   })
-
-//   client.on('data', function (data) {
-//     console.log('Received: ' + data)
-//     client.destroy() // kill client after server's response
-//   })
-
-//   client.on('close', function () {
-//     console.log('Connection closed')
-//   })
-
-//   await new Promise((resolve) => setTimeout(resolve, 1000000))
-
-//   client.write('TESTANDO!!!')
-
-//   return {
-//     props: {
-//       client: 'any'
-//     }
-//   }
-// }
+import { useCServer } from '@contexts/CentralServer'
 
 let socket: Socket<DefaultEventsMap, DefaultEventsMap>
 
 const Home: NextPage = () => {
-  const [floor, setFloor] = useState(floors[0])
+  const { addFloor, removeFloor, getFloors, currentFloor, setCurrentFloor } =
+    useCServer()
 
-  const handleFloorChange = useCallback((index) => {
-    // setFloor(floorsMap[index])
-    setFloor(index)
-  }, [])
+  const handleFloorChange = useCallback(
+    (floor: string) => {
+      setCurrentFloor(floor)
+    },
+    [setCurrentFloor]
+  )
 
   useEffect(() => {
     const socketInitializer = async () => {
@@ -78,6 +54,18 @@ const Home: NextPage = () => {
       socket.on('hello', (msg: any) => {
         console.log('HELLO CLIENT: ', msg)
       })
+
+      socket.on('connection', (msg: ServerEvent) => {
+        const connected = Boolean(Number(msg?.value))
+        console.log(
+          `Server ${msg.from} ${connected ? 'connected' : 'disconnected'}`
+        )
+        connected ? addFloor(msg?.from) : removeFloor(msg?.from)
+        setCurrentFloor(
+          connected ? msg?.from : getFloors.length > 0 ? getFloors[0] : null
+        )
+        toast.info(`${msg.from} ${msg.value ? 'connected' : 'disconnected'}`)
+      })
     }
 
     socketInitializer()
@@ -85,11 +73,12 @@ const Home: NextPage = () => {
     return () => {
       socket.disconnect()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (
     <>
-      <Flex direction="column" width="50%" margin="0 auto">
+      {/* <Flex direction="column" width="50%" margin="0 auto">
         <Button
           colorScheme="purple"
           onClick={() => {
@@ -98,7 +87,7 @@ const Home: NextPage = () => {
         >
           SEND HELLO
         </Button>
-      </Flex>
+      </Flex> */}
       <Grid
         justifyContent="center"
         gridTemplateRows="auto 1fr"
@@ -107,30 +96,35 @@ const Home: NextPage = () => {
       >
         <GridItem>
           <Flex width="100%" gap={12}>
-            <FloorSwitcher floors={floors} onChange={handleFloorChange} />
+            <FloorSwitcher floors={getFloors} onChange={handleFloorChange} />
             <StatsDisplay
               label="Ocupação Total"
               info={360}
               helpText=""
               icon={IoIosPeople}
             />
-            <Text
-              fontSize="smaller"
-              color="gray.500"
-              fontWeight="light"
-              textAlign="right"
+            <Skeleton
+              height="15px"
+              isLoaded={currentFloor !== null}
               justifySelf="flex-end"
               alignSelf="flex-end"
               ml="auto"
             >
-              {floor} \\
-            </Text>
+              <Text
+                fontSize="smaller"
+                color="gray.500"
+                fontWeight="light"
+                textAlign="right"
+              >
+                {currentFloor} \\
+              </Text>
+            </Skeleton>
           </Flex>
           <Divider borderColor="gray.100" mt={0} />
         </GridItem>
 
         <VStack alignItems="flex-start" gap={2}>
-          <TemperaturePanel floor={floorsMap[floor]} />
+          <TemperaturePanel />
           <Box>
             <Text
               fontSize="smaller"
@@ -141,10 +135,18 @@ const Home: NextPage = () => {
               Dispositivos \\
             </Text>
             <Divider borderColor="white" mb={1} />
-            <DevicesPanel floor={floorsMap[floor]} />
+            <DevicesPanel />
           </Box>
         </VStack>
       </Grid>
+
+      <Modal
+        title="Aguardando conexão..."
+        isOpen={getFloors.length === 0}
+        onClose={() => {}}
+      >
+        <Progress size="xs" colorScheme="purple" isIndeterminate />
+      </Modal>
     </>
   )
 }
