@@ -1,12 +1,13 @@
 import React, {
   createContext,
+  useCallback,
   useContext,
   useMemo,
   useReducer,
   useState
 } from 'react'
 
-import { ACTIONS, stateReducer } from './reducer'
+import { ACTIONS, stateReducer, UpdateDeviceAction } from './reducer'
 
 type Status = boolean | number | 'pending'
 
@@ -39,6 +40,7 @@ export type CentralServerType = {
   getFloors: string[]
   currentFloor: string | null
   setCurrentFloor: (floor: string | null) => void
+  updateDevice: (payload: UpdateDeviceAction['payload']) => void
 }
 
 const defaultValues = {
@@ -63,7 +65,8 @@ export const CentralServerDefaultValues: CentralServerType = {
   removeFloor: () => ({}),
   getFloors: [],
   currentFloor: null,
-  setCurrentFloor: () => ({})
+  setCurrentFloor: () => ({}),
+  updateDevice: () => ({})
 }
 
 export const CentralServer = createContext<CentralServerType>(
@@ -103,19 +106,29 @@ export const CentralServerProvider: React.FC = ({ children }) => {
 
   console.log('CentralServerProvider: ', state)
 
-  const addFloor = (floor: string) => {
-    dispatchEvent({
-      type: ACTIONS.ADD_FLOOR,
-      payload: { [floor]: defaultValues }
-    })
-  }
+  const addFloor = useCallback(
+    (floor: string) => {
+      dispatchEvent({
+        type: ACTIONS.ADD_FLOOR,
+        payload: { [floor]: defaultValues }
+      })
+    },
+    [dispatchEvent]
+  )
 
-  const removeFloor = (floor: string) => {
+  const removeFloor = useCallback((floor: string) => {
     dispatchEvent({
       type: ACTIONS.REMOVE_FLOOR,
       payload: floor
     })
-  }
+  }, [])
+
+  const updateDevice = useCallback((payload: UpdateDeviceAction['payload']) => {
+    dispatchEvent({
+      type: ACTIONS.UPDATE_DEVICE,
+      payload
+    })
+  }, [])
 
   const value = useMemo(
     () => ({
@@ -124,9 +137,10 @@ export const CentralServerProvider: React.FC = ({ children }) => {
       addFloor,
       removeFloor,
       currentFloor,
-      setCurrentFloor
+      setCurrentFloor,
+      updateDevice
     }),
-    [currentFloor, getFloors, state]
+    [addFloor, currentFloor, getFloors, removeFloor, state, updateDevice]
   )
 
   return (

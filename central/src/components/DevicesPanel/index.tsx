@@ -7,15 +7,17 @@ import get from 'lodash/get'
 import { StatsDisplay } from '@components/StatsDisplay'
 import { SwitchDevice } from '@components/Switch'
 import { useCServer } from '@contexts/CentralServer'
+import { UpdateDeviceAction } from '@contexts/CentralServer/reducer'
 
 const statusMap = (status: boolean) => (status ? 'Ligada' : 'Desligada')
 
 export const DevicesPanel: React.FC = () => {
-  const { currentFloor, floors } = useCServer()
+  const { currentFloor, floors, updateDevice } = useCServer()
 
   const handleChange = useCallback(
-    (payload) => () => console.log('TODO: handleChange', payload),
-    []
+    (payload: Omit<UpdateDeviceAction['payload'], 'floor'>) => () =>
+      updateDevice({ ...payload, floor: currentFloor! }),
+    [currentFloor, updateDevice]
   )
 
   const deviceStatus = useCallback(
@@ -39,11 +41,14 @@ export const DevicesPanel: React.FC = () => {
               <SwitchDevice
                 label=""
                 isChecked={deviceStatus('AC') === true}
-                onChange={handleChange({})}
+                onChange={handleChange({
+                  device: 'AC',
+                  status: !deviceStatus('AC')
+                })}
               />
             </Box>
           }
-          helpText={deviceStatus('bulbs.room01') ? 'Ligado' : 'Desligado'}
+          helpText={deviceStatus('AC') ? 'Ligado' : 'Desligado'}
           icon={MdOutlineAir}
           isLoaded={typeof deviceStatus('AC') === 'boolean'}
         />
@@ -58,12 +63,13 @@ export const DevicesPanel: React.FC = () => {
                 label=""
                 isChecked={deviceStatus('bulbs.room01') === true}
                 onChange={handleChange({
-                  //   bulbs: { room01: !status?.[floor]?.bulbs.room01 }
+                  device: 'bulbs.room01',
+                  status: !deviceStatus('bulbs.room01')
                 })}
               />
             </Box>
           }
-          helpText={statusMap(deviceStatus('bulbs.room01'))}
+          helpText={statusMap(Boolean(deviceStatus('bulbs.room01')))}
           icon={RiLightbulbFlashLine}
           isLoaded={typeof deviceStatus('bulbs.room01') === 'boolean'}
         />
@@ -78,12 +84,13 @@ export const DevicesPanel: React.FC = () => {
                 label=""
                 isChecked={deviceStatus('bulbs.room02') === true}
                 onChange={handleChange({
-                  //   bulbs: { room02: !status?.[floor]?.bulbs.room02 }
+                  device: 'bulbs.room02',
+                  status: !deviceStatus('bulbs.room02')
                 })}
               />
             </Box>
           }
-          helpText={statusMap(deviceStatus('bulbs.room02'))}
+          helpText={statusMap(Boolean(deviceStatus('bulbs.room02')))}
           icon={RiLightbulbFlashLine}
           isLoaded={typeof deviceStatus('bulbs.room02') === 'boolean'}
         />
@@ -98,12 +105,13 @@ export const DevicesPanel: React.FC = () => {
                 label=""
                 isChecked={deviceStatus('bulbs.corridor') === true}
                 onChange={handleChange({
-                  //   bulbs: { corridor: !status?.[floor]?.bulbs.corridor }
+                  device: 'bulbs.corridor',
+                  status: !deviceStatus('bulbs.corridor')
                 })}
               />
             </Box>
           }
-          helpText={statusMap(deviceStatus('bulbs.corridor'))}
+          helpText={statusMap(Boolean(deviceStatus('bulbs.corridor')))}
           icon={RiLightbulbFlashLine}
           isLoaded={typeof deviceStatus('bulbs.corridor') === 'boolean'}
         />
