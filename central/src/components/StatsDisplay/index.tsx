@@ -1,5 +1,6 @@
 import { IconType } from 'react-icons'
 import {
+  BoxProps,
   Flex,
   Icon,
   Skeleton,
@@ -9,7 +10,7 @@ import {
   StatNumber
 } from '@chakra-ui/react'
 
-interface StatsDisplayProps {
+interface StatsDisplayProps extends Partial<BoxProps> {
   label: string
   info: React.ReactNode | number | string
   helpText: string
@@ -22,17 +23,13 @@ export const StatsDisplay: React.FC<StatsDisplayProps> = ({
   info,
   helpText,
   icon,
-  isLoaded
+  isLoaded,
+  ...props
 }) => {
   return (
-    <Stat>
+    <Stat minHeight="86px" {...props}>
       <StatLabel>{label}</StatLabel>
-      <Skeleton
-        isLoaded={isLoaded}
-        maxWidth="100px"
-        startColor="purple.100"
-        endColor="blackAlpha.200"
-      >
+      <Skeleton isLoaded={isLoaded} maxWidth="100px" height="36px">
         <StatNumber>
           <Flex alignItems="center">
             <Icon as={icon} boxSize="26px" mr={1} fill="url(#svg-gradient)" />

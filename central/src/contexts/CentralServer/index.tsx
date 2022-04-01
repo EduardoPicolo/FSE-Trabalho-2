@@ -74,29 +74,29 @@ export const CentralServer = createContext<CentralServerType>(
 )
 
 export const CentralServerProvider: React.FC = ({ children }) => {
-  //   const [state, dispatchEvent] = useReducer(stateReducer, {
-  //     floors: {}
-  //   })
   const [state, dispatchEvent] = useReducer(stateReducer, {
-    floors: {
-      Térreo: {
-        connected: false,
-        temperature: true,
-        humidity: true,
-        AC: true,
-        bulbs: {
-          room01: true,
-          room02: false,
-          corridor: false
-        },
-        windows: {
-          room1: true,
-          room2: true
-        }
-      } as any,
-      '1oAndar': defaultValues as any
-    }
+    floors: {}
   })
+  //   const [state, dispatchEvent] = useReducer(stateReducer, {
+  //     floors: {
+  //       Térreo: {
+  //         connected: false,
+  //         temperature: true,
+  //         humidity: true,
+  //         AC: true,
+  //         bulbs: {
+  //           room01: true,
+  //           room02: false,
+  //           corridor: false
+  //         },
+  //         windows: {
+  //           room1: true,
+  //           room2: true
+  //         }
+  //       } as any,
+  //       '1oAndar': defaultValues as any
+  //     }
+  //   })
 
   const getFloors = useMemo(() => Object.keys(state.floors), [state.floors])
 

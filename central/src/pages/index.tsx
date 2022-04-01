@@ -44,16 +44,12 @@ const Home: NextPage = () => {
       socket = io()
 
       socket.on('connect', () => {
-        console.log('frontend connected')
+        console.log('Central server started')
       })
 
-      socket.on('update-temperature', (msg: any) => {
-        console.log('update-temperature', msg)
-      })
-
-      socket.on('hello', (msg: any) => {
-        console.log('HELLO CLIENT: ', msg)
-      })
+      //   socket.on('update-temperature', (msg: any) => {
+      //     console.log('update-temperature', msg)
+      //   })
 
       socket.on('connection', (msg: ServerEvent) => {
         const connected = Boolean(Number(msg?.value))
@@ -65,6 +61,10 @@ const Home: NextPage = () => {
           connected ? msg?.from : getFloors.length > 0 ? getFloors[0] : null
         )
         toast.info(`${msg.from} ${msg.value ? 'connected' : 'disconnected'}`)
+      })
+
+      socket.on('event', (msg: ServerEvent) => {
+        console.log('EVENT: ', msg)
       })
     }
 
@@ -96,14 +96,18 @@ const Home: NextPage = () => {
       >
         <GridItem>
           <Flex width="100%" gap={12}>
-            <FloorSwitcher floors={getFloors} onChange={handleFloorChange} />
+            {getFloors.length > 0 && (
+              <FloorSwitcher floors={getFloors} onChange={handleFloorChange} />
+            )}
             <StatsDisplay
               label="Ocupação Total"
               info={360}
               helpText=""
               icon={IoIosPeople}
+              minHeight="auto"
             />
             <Skeleton
+              minWidth="60px"
               height="15px"
               isLoaded={currentFloor !== null}
               justifySelf="flex-end"
@@ -120,10 +124,10 @@ const Home: NextPage = () => {
               </Text>
             </Skeleton>
           </Flex>
-          <Divider borderColor="gray.100" mt={0} />
+          <Divider borderColor="gray.50" mt={0} />
         </GridItem>
 
-        <VStack alignItems="flex-start" gap={2}>
+        <VStack alignItems="flex-start" gap={2} maxWidth="600px">
           <TemperaturePanel />
           <Box>
             <Text
@@ -134,7 +138,19 @@ const Home: NextPage = () => {
             >
               Dispositivos \\
             </Text>
-            <Divider borderColor="white" mb={1} />
+            <Divider borderColor="gray.50" mb={1} />
+            <DevicesPanel />
+          </Box>
+          <Box>
+            <Text
+              fontSize="smaller"
+              color="gray.500"
+              fontWeight="light"
+              textAlign="right"
+            >
+              Sensores \\
+            </Text>
+            <Divider borderColor="gray.50" mb={1} />
             <DevicesPanel />
           </Box>
         </VStack>

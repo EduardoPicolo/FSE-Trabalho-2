@@ -23,11 +23,10 @@ const SocketHandler = (req: NextApiRequest, res: ExtendedNextApiResponse) => {
       try {
         data = JSON.parse(req.body) as ServerEvent
         console.log('Event received ' + data.type + ' from ' + data.from)
+        res?.socket?.server?.io.emit('event', data)
       } catch {
         res.status(400).send('Invalid event')
       }
-
-      res?.socket?.server?.io.emit('event', data)
     }
 
     default: {

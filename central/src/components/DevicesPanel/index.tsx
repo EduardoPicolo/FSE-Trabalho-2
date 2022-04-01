@@ -22,7 +22,7 @@ export const DevicesPanel: React.FC = () => {
 
   const deviceStatus = useCallback(
     (device: string) => {
-      if (!currentFloor) return false
+      if (!currentFloor) return 'pending'
 
       const status = get(floors, `${currentFloor}.${device}`, false) as unknown
 
