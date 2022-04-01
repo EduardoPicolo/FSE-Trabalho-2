@@ -116,6 +116,18 @@ export const DevicesPanel: React.FC = () => {
           isLoaded={typeof deviceStatus('bulbs.corridor') === 'boolean'}
         />
       </WrapItem>
+
+      {/* <WrapItem>
+        <StatsDisplay
+          label="Aspersor de Água (Incêndio)"
+          info={deviceStatus('sprinkler') ? 'Ligado' : 'Desligado'}
+          helpText={
+            deviceStatus('sensors.smoke') ? 'Fumaça detectada' : 'Sem fumaça'
+          }
+          icon={MdOutlineLocalFireDepartment}
+          isLoaded={typeof deviceStatus('sprinkler') === 'boolean'}
+        />
+      </WrapItem> */}
     </Wrap>
   )
 }

@@ -21,6 +21,7 @@ import { io, Socket } from 'socket.io-client'
 import { DevicesPanel } from '@components/DevicesPanel'
 import { FloorSwitcher } from '@components/FloorSwitcher'
 import { Modal } from '@components/Modal'
+import { SensorsPanel } from '@components/SensorsPanel'
 import { StatsDisplay } from '@components/StatsDisplay'
 import { TemperaturePanel } from '@components/TemperaturePanel'
 import { useCServer } from '@contexts/CentralServer'
@@ -28,8 +29,15 @@ import { useCServer } from '@contexts/CentralServer'
 let socket: Socket<DefaultEventsMap, DefaultEventsMap>
 
 const Home: NextPage = () => {
-  const { addFloor, removeFloor, getFloors, currentFloor, setCurrentFloor } =
-    useCServer()
+  const {
+    addFloor,
+    removeFloor,
+    getFloors,
+    currentFloor,
+    setCurrentFloor,
+    updateDevice,
+    handleEvent
+  } = useCServer()
 
   const handleFloorChange = useCallback(
     (floor: string) => {
@@ -63,8 +71,8 @@ const Home: NextPage = () => {
         toast.info(`${msg.from} ${msg.value ? 'connected' : 'disconnected'}`)
       })
 
-      socket.on('event', (msg: ServerEvent) => {
-        console.log('EVENT: ', msg)
+      socket.on('event', (event: ServerEvent) => {
+        handleEvent(event)
       })
     }
 
@@ -81,11 +89,11 @@ const Home: NextPage = () => {
       {/* <Flex direction="column" width="50%" margin="0 auto">
         <Button
           colorScheme="purple"
-          onClick={() => {
-            socket.emit('hello', 'hello FROM CLIENT')
-          }}
+          onClick={() =>
+            handleEvent({ from: 'Térreo', type: 'presenca', value: '1' })
+          }
         >
-          SEND HELLO
+          UPDATE DEVICE
         </Button>
       </Flex> */}
       <Grid
@@ -127,33 +135,37 @@ const Home: NextPage = () => {
           <Divider borderColor="gray.50" mt={0} />
         </GridItem>
 
-        <VStack alignItems="flex-start" gap={2} maxWidth="600px">
-          <TemperaturePanel />
-          <Box>
-            <Text
-              fontSize="smaller"
-              color="gray.500"
-              fontWeight="light"
-              textAlign="right"
-            >
-              Dispositivos \\
-            </Text>
-            <Divider borderColor="gray.50" mb={1} />
-            <DevicesPanel />
-          </Box>
-          <Box>
-            <Text
-              fontSize="smaller"
-              color="gray.500"
-              fontWeight="light"
-              textAlign="right"
-            >
-              Sensores \\
-            </Text>
-            <Divider borderColor="gray.50" mb={1} />
-            <DevicesPanel />
-          </Box>
-        </VStack>
+        <GridItem>
+          <VStack alignItems="flex-start" gap="12" maxWidth="600px">
+            <TemperaturePanel />
+
+            <Box style={{ marginTop: '-1rem' }}>
+              <Text
+                fontSize="smaller"
+                color="gray.500"
+                fontWeight="light"
+                textAlign="right"
+              >
+                Dispositivos \\
+              </Text>
+              <Divider borderColor="gray.50" mb={1} />
+              <DevicesPanel />
+            </Box>
+
+            <Box width="100%">
+              <Text
+                fontSize="smaller"
+                color="gray.500"
+                fontWeight="light"
+                textAlign="right"
+              >
+                Sensores \\
+              </Text>
+              <Divider borderColor="gray.50" mb={1} />
+              <SensorsPanel />
+            </Box>
+          </VStack>
+        </GridItem>
       </Grid>
 
       <Modal
