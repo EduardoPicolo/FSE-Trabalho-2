@@ -1,20 +1,37 @@
-#include "SensorWorker.hpp"
+#include "ComponentsWorker.hpp"
 
-EventController *SensorWorker::event_ = nullptr;
-int SensorWorker::presenceSensor_ = 0;
-int SensorWorker::smokeSensor_ = 0;
-int SensorWorker::window01_ = 0;
-int SensorWorker::window02_ = 0;
-int SensorWorker::totalPeople_ = 0;
-int SensorWorker::peopleGroundFloor_ = 0;
-int SensorWorker::peopleFirstFloor_ = 0;
+EventController *ComponentsWorker::event_ = nullptr;
+int ComponentsWorker::presenceSensor_ = 0;
+int ComponentsWorker::smokeSensor_ = 0;
+int ComponentsWorker::window01_ = 0;
+int ComponentsWorker::window02_ = 0;
+int ComponentsWorker::totalPeople_ = 0;
+int ComponentsWorker::peopleGroundFloor_ = 0;
+int ComponentsWorker::peopleFirstFloor_ = 0;
 
-SensorWorker::SensorWorker()
+ComponentsWorker::ComponentsWorker(IO *io, EventController *eventController)
 {
-    event_ = EventController::getInstance();
+    io_ = io;
+    event_ = eventController;
 }
 
-void SensorWorker::initComponentWorker(component component)
+void ComponentsWorker::start()
+{
+    wiringPiSetup();
+
+    for (component component : io_->getInputs())
+    {
+        component.gpio = io_->toWiringPiPin(component.gpio);
+        pinMode(component.gpio, INPUT);
+        int initialState = digitalRead(component.gpio);
+        component.state = initialState;
+        event_->sendEvent(event_->createEvent(component.type.c_str(), std::to_string(initialState).c_str()));
+        initComponentWorker(component);
+        sleep(1); // sending to many events at the same time can cause issues to the NodeJS Buffer
+    }
+}
+
+void ComponentsWorker::initComponentWorker(component component)
 {
     if (component.type == "presenca")
     {
@@ -31,7 +48,7 @@ void SensorWorker::initComponentWorker(component component)
         // return CountEnterHandler;
         // wiringPiISR(23, INT_EDGE_BOTH, (void (*)())getComponentHandler("contagem"));
     }
-    if (component.type.find("janela") != std::string::npos)
+    else if (component.type.find("janela") != std::string::npos)
     {
         if (component.tag.find("01") != std::string::npos)
         {
@@ -44,11 +61,14 @@ void SensorWorker::initComponentWorker(component component)
             wiringPiISR(component.gpio, INT_EDGE_BOTH, Window02Handler);
         }
     }
+    else if (component.type == "porta")
+    {
+        // return PortaHandler;
+        // wiringPiISR(component.gpio, INT_EDGE_BOTH, );
+    }
 }
 
-SensorWorker::~SensorWorker() {}
-
-void SensorWorker::Window01Handler()
+void ComponentsWorker::Window01Handler()
 {
     if (window01_ == 0)
     {
@@ -66,7 +86,7 @@ void SensorWorker::Window01Handler()
     event_->sendEvent(event_->createEvent(eventType.c_str(), std::to_string(window01_).c_str()));
 }
 
-void SensorWorker::Window02Handler()
+void ComponentsWorker::Window02Handler()
 {
     if (window02_ == 0)
     {
@@ -84,7 +104,22 @@ void SensorWorker::Window02Handler()
     event_->sendEvent(event_->createEvent(eventType.c_str(), std::to_string(window02_).c_str()));
 }
 
-void SensorWorker::PresenceSensorHandler()
+void ComponentsWorker::DoorSensorHandler()
+{
+    if (door_ == 0)
+    {
+        door_ = 1;
+        std::cout << "ensor de Porta Entrada Ligado" << std::endl;
+    }
+    else if (door_ == 1)
+    {
+        door_ = 0;
+        std::cout << "ensor de Porta Entrada desligado" << std::endl;
+    }
+    event_->sendEvent(event_->createEvent("porta", std::to_string(door_).c_str()));
+}
+
+void ComponentsWorker::PresenceSensorHandler()
 {
     if (presenceSensor_ == 0)
     {
@@ -99,7 +134,7 @@ void SensorWorker::PresenceSensorHandler()
     event_->sendEvent(event_->createEvent("presenca", std::to_string(presenceSensor_).c_str()));
 }
 
-void SensorWorker::SmokeSensorHandler()
+void ComponentsWorker::SmokeSensorHandler()
 {
     if (smokeSensor_ == 0)
     {
@@ -113,5 +148,8 @@ void SensorWorker::SmokeSensorHandler()
     }
     event_->sendEvent(event_->createEvent("fumaca", std::to_string(smokeSensor_).c_str()));
 }
+
 // void CountEnterHandler() {}
 // void CountExitHandler() {}
+
+ComponentsWorker::~ComponentsWorker() {}

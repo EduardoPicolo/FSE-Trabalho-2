@@ -48,9 +48,9 @@ export const SensorsPanel: React.FC = () => {
       <GridItem>
         <StatsDisplay
           label="Sensor da Janela 01"
-          info={deviceStatus('window.room1') ? 'Ligado' : 'Desligado'}
+          info={deviceStatus('windows.room1') ? 'Ligado' : 'Desligado'}
           icon={GiWindow}
-          isLoaded={typeof deviceStatus('window.room1') === 'boolean'}
+          isLoaded={typeof deviceStatus('windows.room1') === 'boolean'}
         />
       </GridItem>
 
@@ -75,9 +75,9 @@ export const SensorsPanel: React.FC = () => {
       <GridItem>
         <StatsDisplay
           label="Sensor da Janela 02"
-          info={deviceStatus('window.room2') ? 'Ligado' : 'Desligado'}
+          info={deviceStatus('windows.room2') ? 'Ligado' : 'Desligado'}
           icon={GiWindow}
-          isLoaded={typeof deviceStatus('window.room2') === 'boolean'}
+          isLoaded={typeof deviceStatus('windows.room2') === 'boolean'}
         />
       </GridItem>
 

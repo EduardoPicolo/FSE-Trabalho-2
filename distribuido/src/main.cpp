@@ -15,7 +15,7 @@
 #include "Exception.hpp"
 #include "EventController.hpp"
 #include "ServerConfig.hpp"
-#include <SensorWorker.hpp>
+#include <ComponentsWorker.hpp>
 #include "wiringPi.h"
 
 using namespace std;
@@ -32,12 +32,11 @@ int main(int argc, char const *argv[])
     signal(SIGINT, quit);
 
     ServerConfig config = ServerConfig(argv[1]);
-
     Socket *socket = Socket::getInstance(); // Socket
 
-    // initComponents can not send event because socket is not connected
-    // IO io = IO(config.getComponentsJSON("inputs"), config.getComponentsJSON("outputs"));
-    // io.initComponents();
+    IO io = IO(config.getComponentsJSON("inputs"), config.getComponentsJSON("outputs"));
+    EventController eventController = EventController(config.getName(), &io);
+    ComponentsWorker worker = ComponentsWorker(&io, &eventController);
 
     try
     {
@@ -51,19 +50,15 @@ int main(int argc, char const *argv[])
         quit(1);
     }
 
-    EventController *event = EventController::getInstance();
-    event->setHostName(config.getName());
-    std::thread eventThread(&EventController::listen, event);
-    // eventThread.detach();
+    std::thread eventThread(&EventController::listen, eventController);
 
-    IO io = IO(config.getComponentsJSON("inputs"), config.getComponentsJSON("outputs"));
-    io.initComponents();
+    worker.start();
 
     while (1)
     {
         cout << "MAIN" << endl;
         sleep(10);
-        event->sendEvent(event->createEvent("hello", "teste"));
+        // event->sendEvent(event->createEvent("hello", "teste"));
     }
 
     return 0;

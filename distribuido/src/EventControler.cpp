@@ -5,25 +5,16 @@
 
 using namespace std;
 
-EventController::EventController()
+EventController::EventController(std::string hostName, IO *io)
 {
     socket_ = Socket::getInstance();
-}
-
-// Define the static Socket pointer
-EventController *EventController::inst_ = NULL;
-
-EventController *EventController::getInstance()
-{
-    if (inst_ == NULL)
-    {
-        inst_ = new EventController();
-    }
-    return (inst_);
+    io_ = io;
+    hostName_ = hostName.c_str();
 }
 
 void EventController::listen()
 {
+    std::cout << "Listening for events..." << std::endl;
     while (1)
     {
         string data = socket_->readData();
@@ -89,7 +80,6 @@ const char *EventController::createEvent(const char *type, const char *value)
 
 void EventController::sendEvent(const char *event)
 {
-    // Socket *socket = Socket::getInstance();
     socket_->sendData(event);
 }
 

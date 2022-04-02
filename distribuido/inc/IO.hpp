@@ -15,9 +15,6 @@
 
 #include "cJSON.h"
 #include "wiringPi.h"
-#include "Socket.hpp"
-#include "EventController.hpp"
-#include "SensorWorker.hpp"
 #include "Component.hpp"
 
 class IO
@@ -27,17 +24,12 @@ public:
     ~IO();
     std::vector<component> getInputs();
     std::vector<component> getOutputs();
-    void initComponents();
+    component getComponent(std::string tag);
 
-protected:
-    EventController *event_;
+    // Receives a GPIO port number and translates to a WiringPI pin number
+    int toWiringPiPin(int gpio);
 
 private:
     std::vector<component> inputComponents_;
     std::vector<component> outputComponents_;
-
-    // auto initComponentWorker(component component);
-
-    // Receives a GPIO port number and translates to a WiringPI pin number
-    int toWiringPiPin(int gpio);
 };

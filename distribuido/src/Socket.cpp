@@ -78,7 +78,7 @@ std::string Socket::readData()
     // if (is_ready(socket_))
     // {
     // }
-    cout << "WAITING FOR DATA..." << endl;
+    cout << "Ready to receive event..." << endl;
     bytes = read(socket_, buffer, 1024); // this is a blocking call
     if (bytes < 0)
     {

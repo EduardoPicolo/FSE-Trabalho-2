@@ -15,22 +15,24 @@
 
 #include "cJSON.h"
 #include "wiringPi.h"
-#include "Socket.hpp"
 #include "EventController.hpp"
 #include "Component.hpp"
+#include "IO.hpp"
 
-class SensorWorker
+class ComponentsWorker
 {
 public:
-    SensorWorker();
-    ~SensorWorker();
+    ComponentsWorker(IO *io, EventController *eventController);
+    ~ComponentsWorker();
+    void start();
     void initComponents();
     void initComponentWorker(component component);
 
-protected:
+private:
+    IO *io_;
+
     static EventController *event_;
 
-private:
     static int totalPeople_;
     static int peopleGroundFloor_;
     static int peopleFirstFloor_;
@@ -39,32 +41,15 @@ private:
     static int smokeSensor_;
     static int window01_;
     static int window02_;
+    static int door_;
 
-    // static handlers due to wiringPiISR typings
-    static void Window01Handler();
-    static void Window02Handler();
+    // static handlers because wiringPiISR() won't accept a std::function
     static void PresenceSensorHandler();
     static void SmokeSensorHandler();
+    static void Window01Handler();
+    static void Window02Handler();
+    static void DoorSensorHandler();
 
     static void CountEnterHandler();
     static void CountExitHandler();
 };
-
-// void WindowT01Handler();
-// void WindowT02Handler();
-// void Window101Handler();
-// void Window102Handler();
-
-// void PresenceT01Handler();
-// void Presence101Handler();
-
-// void CountEnterHandler();
-// void CountExitHandler();
-
-// static int windowT01 = 0;
-// static int windowT02 = 0;
-// static int window101 = 0;
-// static int window102 = 0;
-
-// static int presenceSensorT01 = 0;
-// static int presenceSensor101 = 0;

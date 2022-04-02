@@ -15,11 +15,13 @@
 
 #include "cJSON.h"
 #include "Socket.hpp"
+#include "IO.hpp"
 
 class EventController
 {
 public:
-    static EventController *getInstance();
+    EventController(std::string hostName, IO *io);
+    // static EventController *getInstance();
     void setHostName(std::string hostName);
     void listen();
     void handleEvent(const char *event);
@@ -28,13 +30,12 @@ public:
     const char *createEvent(const char *type, const char *value);
     void sendEvent(const char *event);
 
-protected:
-    Socket *socket_;
-    const char *hostName_;
-
 private:
-    static EventController *inst_; // The one, single instance
-    EventController();
-    EventController(const EventController &);
-    EventController &operator=(const EventController &);
+    Socket *socket_;
+    IO *io_;
+    const char *hostName_;
+    // static EventController *inst_; // The one, single instance
+    // EventController();
+    // EventController(const EventController &);
+    // EventController &operator=(const EventController &);
 };

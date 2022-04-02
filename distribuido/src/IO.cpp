@@ -5,7 +5,6 @@ IO::IO(std::vector<component> inputs, std::vector<component> outputs)
 {
     inputComponents_ = inputs;
     outputComponents_ = outputs;
-    event_ = EventController::getInstance();
 }
 
 std::vector<component> IO::getInputs()
@@ -15,37 +14,6 @@ std::vector<component> IO::getInputs()
 std::vector<component> IO::getOutputs()
 {
     return outputComponents_;
-}
-
-void IO::initComponents()
-{
-    wiringPiSetup();
-
-    SensorWorker worker = SensorWorker();
-
-    for (component component : inputComponents_)
-    {
-        component.gpio = toWiringPiPin(component.gpio);
-        pinMode(component.gpio, INPUT);
-        int initialState = digitalRead(component.gpio);
-        component.state = initialState;
-        event_->sendEvent(event_->createEvent(component.type.c_str(), std::to_string(initialState).c_str()));
-        // IO::initComponentWorker(component);
-        worker.initComponentWorker(component);
-        sleep(1); // sending to many events at the same time can cause issues to the NodeJS Buffer
-    }
-
-    // for (int i = 0; i < outputComponents_.size(); i++)
-    // {
-    //     // sensor de presença
-    //     std::cout << "aqui " << i << std::endl;
-    //     IO::getComponentHandler(outputComponents_[i]);
-    //     // wiringPiISR(23, INT_EDGE_RISING, (void (*)())getComponentHandler("contagem"));
-    //     // std::cout << "aqui 2" << std::endl;
-    //     // wiringPiISR(25, INT_EDGE_RISING, (void (*)())getComponentHandler("presenca"));
-    //     // std::cout << "aqui 3" << std::endl;
-    //     // wiringPiISR(toWiringPiPin(inputComponents_[i].gpio), INT_EDGE_BOTH, getComponentHandler());
-    // }
 }
 
 int IO::toWiringPiPin(int gpio)
