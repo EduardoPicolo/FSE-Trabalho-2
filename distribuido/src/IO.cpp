@@ -11,9 +11,21 @@ std::vector<component> IO::getInputs()
 {
     return inputComponents_;
 }
+
 std::vector<component> IO::getOutputs()
 {
     return outputComponents_;
+}
+
+component IO::getComponent(std::string type)
+{
+    for (component component : outputComponents_)
+    {
+        if (component.type == type)
+        {
+            return component;
+        }
+    }
 }
 
 int IO::toWiringPiPin(int gpio)

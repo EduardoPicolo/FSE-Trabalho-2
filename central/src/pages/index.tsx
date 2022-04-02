@@ -45,7 +45,6 @@ const Home: NextPage = () => {
   )
 
   useEffect(() => {
-    console.log('USE EFFECT!!')
     if (!socket) return
     socket?.on('connect', () => {
       console.log('Central server started')

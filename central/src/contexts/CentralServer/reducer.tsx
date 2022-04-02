@@ -40,6 +40,12 @@ export const stateReducer = (state: State, action: Action): State => {
 
     case ACTIONS.UPDATE_DEVICE:
       const { floor, device, status } = action.payload
+
+      if (device === 'sensors.smoke') {
+        if (status) console.log('Smoke detected!')
+        set(state.floors?.[floor], 'sensors.smoke', status)
+      }
+
       const updatedFloor = set(state.floors?.[floor], device, status)
 
       return { floors: { ...state?.floors, [floor]: updatedFloor } }

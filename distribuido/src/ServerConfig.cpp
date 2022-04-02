@@ -29,6 +29,8 @@ std::vector<component> ServerConfig::getComponentsJSON(std::string componentType
         struct component tempComponent;
         tempComponent.type = cJSON_GetObjectItem(data, "type")->valuestring;
 
+        std::cout << "TYPE: " << tempComponent.type << std::endl;
+
         std::string tag = cJSON_GetObjectItem(data, "tag")->valuestring;
         if (tempComponent.type == "janela")
         {

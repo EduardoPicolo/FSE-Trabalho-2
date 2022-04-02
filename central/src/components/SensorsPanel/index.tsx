@@ -14,9 +14,9 @@ export const SensorsPanel: React.FC = () => {
 
   const deviceStatus = useCallback(
     (device: string) => {
-      if (!currentFloor) return 'pending'
+      if (!currentFloor) return 'not-connected'
 
-      const status = get(floors, `${currentFloor}.${device}`, false) as unknown
+      const status = get(floors, `${currentFloor}.${device}`, false)
 
       return status
     },
@@ -25,14 +25,16 @@ export const SensorsPanel: React.FC = () => {
 
   return (
     <Grid templateColumns="1fr 1fr 1fr" gap={8}>
-      <GridItem>
-        <StatsDisplay
-          label="Sensor da Porta de Entrada"
-          info={deviceStatus('sensors.door') ? 'Ligado' : 'Desligado'}
-          icon={BsDoorOpen}
-          isLoaded={typeof deviceStatus('sensors.door') === 'boolean'}
-        />
-      </GridItem>
+      {deviceStatus('sensors.door') !== 'not-connected' && (
+        <GridItem>
+          <StatsDisplay
+            label="Sensor da Porta de Entrada"
+            info={deviceStatus('sensors.door') ? 'Ligado' : 'Desligado'}
+            icon={BsDoorOpen}
+            isLoaded={typeof deviceStatus('sensors.door') === 'boolean'}
+          />
+        </GridItem>
+      )}
 
       <GridItem>
         <StatsDisplay
@@ -70,15 +72,17 @@ export const SensorsPanel: React.FC = () => {
         />
       </GridItem>
 
-      <GridItem>
-        <StatsDisplay
-          label="Aspersor de Água"
-          info={deviceStatus('sprinkler') ? 'Ligado' : 'Desligado'}
-          helpText={deviceStatus('smoke') ? 'Fumaça detectada' : 'Sem fumaça'}
-          icon={MdOutlineLocalFireDepartment}
-          isLoaded={typeof deviceStatus('sprinkler') === 'boolean'}
-        />
-      </GridItem>
+      {deviceStatus('sprinkler') !== 'not-connected' && (
+        <GridItem>
+          <StatsDisplay
+            label="Aspersor de Água"
+            info={deviceStatus('sprinkler') ? 'Ligado' : 'Desligado'}
+            helpText={deviceStatus('smoke') ? 'Fumaça detectada' : 'Sem fumaça'}
+            icon={MdOutlineLocalFireDepartment}
+            isLoaded={typeof deviceStatus('sprinkler') === 'boolean'}
+          />
+        </GridItem>
+      )}
     </Grid>
   )
 }

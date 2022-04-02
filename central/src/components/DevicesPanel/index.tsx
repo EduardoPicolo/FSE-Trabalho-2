@@ -1,6 +1,7 @@
-import React, { useCallback } from 'react'
+import React, { ReactText, useCallback, useEffect, useRef } from 'react'
 import { MdOutlineAir } from 'react-icons/md'
 import { RiLightbulbFlashLine } from 'react-icons/ri'
+import { toast, Zoom } from 'react-toastify'
 import { Box, Wrap, WrapItem } from '@chakra-ui/react'
 import get from 'lodash/get'
 
@@ -8,11 +9,31 @@ import { StatsDisplay } from '@components/StatsDisplay'
 import { SwitchDevice } from '@components/Switch'
 import { useCServer } from '@contexts/CentralServer'
 import { UpdateDeviceAction } from '@contexts/CentralServer/reducer'
+import { mapDeviceToEvent } from '@contexts/CentralServer/utils'
 
 const statusMap = (status: boolean) => (status ? 'Ligada' : 'Desligada')
 
 export const DevicesPanel: React.FC = () => {
   const { currentFloor, floors, updateDevice, socket } = useCServer()
+
+  const toastId = useRef<ReactText | null>(null)
+
+  useEffect(() => {
+    if (!socket) return
+
+    socket?.on('confirmation', (event: ServerEvent) => {
+      if (!toastId.current) return
+      toast.update(toastId.current, {
+        type: toast.TYPE.SUCCESS,
+        theme: 'dark',
+        render: event.value,
+        autoClose: 1500,
+        hideProgressBar: true,
+        pauseOnHover: true
+      })
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [socket])
 
   const handleChange = useCallback(
     (payload: Omit<UpdateDeviceAction['payload'], 'floor'>) => () => {
@@ -20,9 +41,19 @@ export const DevicesPanel: React.FC = () => {
       updateDevice({ floor: currentFloor, ...payload })
       socket?.emit('input-event', {
         to: currentFloor,
-        type: 'lampada 01', // TODO: common event type for both servers!
+        type: mapDeviceToEvent[payload.device], // TODO: common event type for both servers!
         value: payload.status ? '1' : '0'
       })
+      toastId.current = toast(
+        `${payload.status ? 'Ligando' : 'Desligando'} ${
+          mapDeviceToEvent[payload.device]
+        }`,
+        {
+          autoClose: false,
+          theme: 'dark',
+          transition: Zoom
+        }
+      )
     },
     [currentFloor, socket, updateDevice]
   )
@@ -123,18 +154,6 @@ export const DevicesPanel: React.FC = () => {
           isLoaded={typeof deviceStatus('bulbs.corridor') === 'boolean'}
         />
       </WrapItem>
-
-      {/* <WrapItem>
-        <StatsDisplay
-          label="Aspersor de Água (Incêndio)"
-          info={deviceStatus('sprinkler') ? 'Ligado' : 'Desligado'}
-          helpText={
-            deviceStatus('sensors.smoke') ? 'Fumaça detectada' : 'Sem fumaça'
-          }
-          icon={MdOutlineLocalFireDepartment}
-          isLoaded={typeof deviceStatus('sprinkler') === 'boolean'}
-        />
-      </WrapItem> */}
     </Wrap>
   )
 }

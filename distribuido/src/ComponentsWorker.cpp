@@ -33,18 +33,19 @@ void ComponentsWorker::start()
         component.state = initialState;
         event_->sendEvent(event_->createEvent(component.type.c_str(), std::to_string(initialState).c_str()));
         initInputWorker(component);
-        sleep(1); // sending to many events at the same time can cause issues to the NodeJS Buffer
+        usleep(500000); // sending to many events at the same time can cause issues to the NodeJS Buffer
     }
 
     for (component component : io_->getOutputs())
     {
         component.gpio = io_->toWiringPiPin(component.gpio);
         pinMode(component.gpio, OUTPUT);
-        int initialState = digitalRead(component.gpio);
+        digitalWrite(component.gpio, LOW);
+        int initialState = 0;
         component.state = initialState;
         event_->sendEvent(event_->createEvent(component.type.c_str(), std::to_string(initialState).c_str()));
         initOutputWorker(component);
-        sleep(1); // sending to many events at the same time can cause issues to the NodeJS Buffer
+        usleep(500000); // sending to many events at the same time can cause issues to the NodeJS Buffer
     }
 }
 

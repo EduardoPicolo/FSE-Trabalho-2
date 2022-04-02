@@ -4,10 +4,7 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { Server } from 'socket.io'
 import { DefaultEventsMap } from 'socket.io/dist/typed-events'
 
-const connectedSockets: Record<string, net.Socket> = {}
-
-// fetch('http://localhost:3000/api/socket')
-// const server = net.createServer()
+import { MessageBuffer } from '@utils/MessageBuffer'
 
 interface ExtendedNextApiResponse<T = any> extends NextApiResponse<T> {
   server: net.Server
@@ -20,6 +17,9 @@ interface ExtendedNextApiResponse<T = any> extends NextApiResponse<T> {
     | null
 }
 
+const connectedSockets: Record<string, net.Socket> = {}
+const received = new MessageBuffer('\r')
+
 const SocketHandler = (req: NextApiRequest, res: ExtendedNextApiResponse) => {
   switch (req.method) {
     case 'GET': {
@@ -31,9 +31,6 @@ const SocketHandler = (req: NextApiRequest, res: ExtendedNextApiResponse) => {
 
         io.on('connection', (socket) => {
           socket.on('input-event', (data) => {
-            // console.log('HELLO SERVER: ', msg)
-            // console.log('CONNECTIONS>: ', connectedSockets)
-            // socket.emit('hello', 'hello FROM SERVER')
             const { to, type, value } = data
 
             connectedSockets?.[to].write(
@@ -48,7 +45,6 @@ const SocketHandler = (req: NextApiRequest, res: ExtendedNextApiResponse) => {
         // @ts-ignore
         res?.socket.server.io = io
 
-        // const server = res?.server as net.Server
         const server = net.createServer()
         server?.listen(10049, function () {
           console.log('Socket is listening on port 10049')
@@ -59,14 +55,6 @@ const SocketHandler = (req: NextApiRequest, res: ExtendedNextApiResponse) => {
             console.log(data?.toString?.() + ' Connected')
             connectedSockets[data?.toString?.()] = connection
 
-            // fetch('http://localhost:3000/api/event', {
-            //   method: 'POST',
-            //   body: JSON.stringify({
-            // from: data?.toString?.(),
-            // type: 'connection',
-            // value: 1
-            //   })
-            // })
             io.emit('connection', {
               from: data?.toString?.(),
               type: 'connection',
@@ -75,35 +63,24 @@ const SocketHandler = (req: NextApiRequest, res: ExtendedNextApiResponse) => {
           })
 
           connection.on('data', function (data) {
-            // console.log('Received event: ' + data)
-            // received.push(data)
+            // console.log('Received: ' + data)
 
-            // while (!received.isFinished()) {
-            //   const message = received.handleData()
-            //   console.log(JSON.parse(message))
-            // }
-
-            // console.log('AFTER: ', received.getMessage())
-
-            //TODO: Find a better way to parse the 'cJSON' data
-            fetch('http://localhost:3000/api/event', {
-              method: 'POST',
-              body: data
-            })
+            try {
+              const payload = JSON.parse(data.toString()) as ServerEvent
+              console.log('PAYLOAD: ', payload)
+              // @ts-ignore
+              if (payload.type === 'confirmacao') {
+                io.emit('confirmation', payload)
+              } else io.emit('event', payload)
+            } catch (error) {
+              console.error('Invalid event')
+            }
           })
 
           connection.on('end', function () {
             Object.keys(connectedSockets).forEach((socket) => {
               if (connectedSockets[socket] === connection) {
                 console.log(`${socket} disconnected`)
-                // fetch('http://localhost:3000/api/event', {
-                //   method: 'POST',
-                //   body: JSON.stringify({
-                //     from: socket,
-                //     type: 'connection',
-                //     value: 0
-                //   })
-                // })
                 io.emit('connection', {
                   from: socket,
                   type: 'connection',

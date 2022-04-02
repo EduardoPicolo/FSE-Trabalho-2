@@ -25,7 +25,8 @@ void EventController::listen()
 void EventController::handleEvent(const char *event)
 {
     // std::cout << "Handle Event: " << event << std::endl;
-    const cJSON *key = NULL;
+    const cJSON *type = NULL;
+    const cJSON *value = NULL;
 
     cJSON *event_json = cJSON_Parse(event);
     if (event_json == NULL)
@@ -39,10 +40,43 @@ void EventController::handleEvent(const char *event)
         cJSON_Delete(event_json);
     }
 
-    key = cJSON_GetObjectItemCaseSensitive(event_json, "type");
-    if (cJSON_IsString(key) && (key->valuestring != NULL))
+    type = cJSON_GetObjectItemCaseSensitive(event_json, "type");
+    value = cJSON_GetObjectItemCaseSensitive(event_json, "value");
+    // if (cJSON_IsString(type) && (type->valuestring != NULL))
+    // {
+    //     cout << "Received event type: " << type->valuestring << endl;
+    // }
+    // if (cJSON_IsString(value) && (value->valuestring != NULL))
+    // {
+    //     cout << "Received event value: " << value->valuestring << endl;
+    // }
+
+    component component = io_->getComponent(type->valuestring);
+
+    wiringPiSetup();
+    component.gpio = io_->toWiringPiPin(component.gpio);
+    pinMode(component.gpio, OUTPUT);
+    if (std::string(value->valuestring) == "1")
     {
-        cout << "Received event: " << key->valuestring << endl;
+        cout << "Turning " << component.tag << " on...";
+        digitalWrite(component.gpio, HIGH);
+        cout << " ✓" << endl;
+        std::string confirmMessage = component.tag + " Ligado";
+        usleep(500000);
+        sendEvent(createEvent("confirmacao", confirmMessage.c_str()));
+    }
+    else if (std::string(value->valuestring) == "0")
+    {
+        cout << "Turning " << component.tag << " off...";
+        digitalWrite(component.gpio, LOW);
+        cout << " ✓" << endl;
+        std::string confirmMessage = component.tag + " Desligado";
+        usleep(500000);
+        sendEvent(createEvent("confirmacao", confirmMessage.c_str()));
+    }
+    else
+    {
+        cout << "Invalid value: " << value->valuestring << endl;
     }
 }
 

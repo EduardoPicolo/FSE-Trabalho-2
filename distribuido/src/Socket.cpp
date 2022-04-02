@@ -86,7 +86,7 @@ std::string Socket::readData()
         exit(1);
     }
     std::string data = std::string(buffer, bytes);
-    std::cout << "RECEIVED: " << data << std::endl;
+    // std::cout << "RECEIVED: " << data << std::endl;
     return data;
 }
 

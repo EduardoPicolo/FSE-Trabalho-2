@@ -13,11 +13,13 @@ import { Socket } from 'socket.io-client'
 import { useSocket } from '@hooks/useSocket'
 
 import { ACTIONS, stateReducer, UpdateDeviceAction } from './reducer'
+import { mapEventToDevice } from './utils'
 
-type Status = 'pending' | boolean
+type Status = 'pending' | boolean | 'not-connected'
 
 export type Sensors = {
-  occupation: number
+  countIn: Status
+  countOut: Status
   temperature: Status
   humidity: Status
   presence: Status
@@ -41,6 +43,7 @@ export type Devices = {
 
 export type FloorComponents = Devices & { sensors: Sensors } & {
   connected: boolean
+  occupation: number
 }
 
 export type CentralServerType = {
@@ -57,8 +60,9 @@ export type CentralServerType = {
 
 const defaultValues: FloorComponents = {
   connected: false,
+  occupation: 0,
   AC: 'pending',
-  sprinkler: 'pending',
+  sprinkler: 'not-connected',
   bulbs: {
     room01: 'pending',
     room02: 'pending',
@@ -67,10 +71,11 @@ const defaultValues: FloorComponents = {
   sensors: {
     temperature: 'pending',
     humidity: 'pending',
-    occupation: 0,
+    countIn: 'pending',
+    countOut: 'pending',
     presence: 'pending',
     smoke: 'pending',
-    door: 'pending',
+    door: 'not-connected',
     windows: {
       room1: 'pending',
       room2: 'pending'
@@ -132,56 +137,12 @@ export const CentralServerProvider: React.FC = ({ children }) => {
 
   const handleEvent = useCallback(
     ({ from, type, value }: ServerEvent) => {
+      console.log('HandleEvent: ', { from, type, value })
+
       const payload = {
         floor: from,
-        device: '',
+        device: mapEventToDevice[type],
         status: Boolean(Number(value))
-      }
-
-      switch (type) {
-        // case 'temperatura':
-        //   payload.device = 'sensors.temperature'
-        //   break
-        // case 'umidade':
-        //   payload.device = 'sensors.humidity'
-        //   break
-        case 'presenca':
-          payload.device = 'sensors.presence'
-          break
-        case 'fumaca':
-          payload.device = 'sensors.smoke'
-
-          if (value === '1')
-            updateDevice({ floor: from, device: 'sprinkler', status: true })
-          else updateDevice({ floor: from, device: 'sprinkler', status: false })
-
-          break
-        case 'janela 01':
-          payload.device = 'sensors.windows.room1'
-          break
-        case 'janela 02':
-          payload.device = 'sensors.windows.room2'
-          break
-        case 'porta':
-          payload.device = 'sensors.door'
-          break
-        case 'lampada 01':
-          payload.device = 'bulbs.room01'
-          break
-        case 'lampada 02':
-          payload.device = 'bulbs.room02'
-          break
-        case 'lampada 03':
-          payload.device = 'bulbs.corridor'
-          break
-        case 'ar-condicionado':
-          payload.device = 'AC'
-          break
-        case 'aspersor':
-          payload.device = 'sprinkler'
-          break
-        default:
-          break
       }
 
       updateDevice(payload)
