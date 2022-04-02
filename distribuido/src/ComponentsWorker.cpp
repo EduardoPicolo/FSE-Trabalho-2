@@ -5,6 +5,7 @@ int ComponentsWorker::presenceSensor_ = 0;
 int ComponentsWorker::smokeSensor_ = 0;
 int ComponentsWorker::window01_ = 0;
 int ComponentsWorker::window02_ = 0;
+int ComponentsWorker::door_ = 0;
 int ComponentsWorker::totalPeople_ = 0;
 int ComponentsWorker::peopleGroundFloor_ = 0;
 int ComponentsWorker::peopleFirstFloor_ = 0;
@@ -63,8 +64,8 @@ void ComponentsWorker::initComponentWorker(component component)
     }
     else if (component.type == "porta")
     {
-        // return PortaHandler;
-        // wiringPiISR(component.gpio, INT_EDGE_BOTH, );
+        door_ = component.state;
+        wiringPiISR(component.gpio, INT_EDGE_BOTH, DoorSensorHandler);
     }
 }
 
@@ -73,12 +74,12 @@ void ComponentsWorker::Window01Handler()
     if (window01_ == 0)
     {
         window01_ = 1;
-        std::cout << "Janela T01 aberta" << std::endl;
+        std::cout << "Janela 01 aberta" << std::endl;
     }
     else if (window01_ == 1)
     {
         window01_ = 0;
-        std::cout << "Janela T01 fechada" << std::endl;
+        std::cout << "Janela 01 fechada" << std::endl;
     }
 
     std::string eventType = "janela 01";

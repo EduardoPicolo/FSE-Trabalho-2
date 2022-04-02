@@ -1,5 +1,3 @@
-// import { Socket } from 'net'
-
 import { useCallback, useEffect } from 'react'
 import type { NextPage } from 'next'
 import { IoIosPeople } from 'react-icons/io'
@@ -30,6 +28,7 @@ let socket: Socket<DefaultEventsMap, DefaultEventsMap>
 
 const Home: NextPage = () => {
   const {
+    floors,
     addFloor,
     removeFloor,
     getFloors,
@@ -86,16 +85,6 @@ const Home: NextPage = () => {
 
   return (
     <>
-      {/* <Flex direction="column" width="50%" margin="0 auto">
-        <Button
-          colorScheme="purple"
-          onClick={() =>
-            handleEvent({ from: 'Térreo', type: 'presenca', value: '1' })
-          }
-        >
-          UPDATE DEVICE
-        </Button>
-      </Flex> */}
       <Grid
         justifyContent="center"
         gridTemplateRows="auto 1fr"

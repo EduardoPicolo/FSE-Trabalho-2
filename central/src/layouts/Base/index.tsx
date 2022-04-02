@@ -13,8 +13,8 @@ export const BaseLayout: React.FC = ({ children }) => {
   return (
     <Box minHeight="100vh" padding={['2', '4', '8', '10']}>
       <S.Video autoPlay playsInline muted loop poster="/img/graph.webp">
-        <source src="/video/graph.webm" type="video/webm" />
-        <source src="/video/graph.mp4" type="video/mp4" />
+        <source src="/video/graphhh.webm" type="video/webm" />
+        <source src="/video/graphhh.mp4" type="video/mp4" />
         Your browser does not support the video tag.
       </S.Video>
 

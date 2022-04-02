@@ -9,7 +9,6 @@ import { CentralServerProvider } from '@contexts/CentralServer'
 import { BaseLayout } from '@layouts/Base'
 import { IconGradient } from '@UI/iconGradient'
 
-import { GlobalStyles } from '@styles/globals'
 import { theme } from '@styles/theme'
 import 'react-loading-skeleton/dist/skeleton.css'
 import 'react-toastify/dist/ReactToastify.css'
@@ -39,8 +38,6 @@ function App({ Component, pageProps }: AppPropsWithLayout) {
 
       <ChakraProvider theme={theme} resetCSS>
         <CentralServerProvider>
-          <GlobalStyles />
-
           <NextNprogress
             color="linear-gradient(
               to right,

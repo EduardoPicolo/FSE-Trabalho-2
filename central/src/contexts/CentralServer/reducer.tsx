@@ -1,4 +1,4 @@
-import { update } from 'lodash'
+import { set } from 'lodash'
 
 import type { FloorComponents } from '.'
 
@@ -30,21 +30,25 @@ export const stateReducer = (state: State, action: Action): State => {
   switch (action.type) {
     case ACTIONS.ADD_FLOOR:
       return { floors: { ...state?.floors, ...action?.payload } }
+      break
 
     case ACTIONS.REMOVE_FLOOR:
       delete state?.floors?.[action?.payload]
 
       return { floors: { ...state?.floors } }
+      break
 
     case ACTIONS.UPDATE_DEVICE:
       const { floor, device, status } = action.payload
-      const updatedFloor = update(state.floors?.[floor], device, () => status)
+      const updatedFloor = set(state.floors?.[floor], device, status)
 
       return { floors: { ...state?.floors, [floor]: updatedFloor } }
       break
 
     default:
-      console.log('Invalid action')
+      console.log(
+        'Invalid action Invalid action Invalid action Invalid action Invalid action Invalid action Invalid action'
+      )
 
       return { ...state }
       break

@@ -8,16 +8,9 @@ import get from 'lodash/get'
 
 import { StatsDisplay } from '@components/StatsDisplay'
 import { FloorComponents, useCServer } from '@contexts/CentralServer'
-import { UpdateDeviceAction } from '@contexts/CentralServer/reducer'
 
 export const SensorsPanel: React.FC = () => {
-  const { currentFloor, floors, updateDevice } = useCServer()
-
-  const handleChange = useCallback(
-    (payload: Omit<UpdateDeviceAction['payload'], 'floor'>) => () =>
-      updateDevice({ ...payload, floor: currentFloor! }),
-    [currentFloor, updateDevice]
-  )
+  const { currentFloor, floors } = useCServer()
 
   const deviceStatus = useCallback(
     (device: keyof FloorComponents['sensors']) => {

@@ -40,7 +40,7 @@ int main(int argc, char const *argv[])
 
     try
     {
-        socket->connectSocket("127.0.0.1", 10049);
+        socket->connectSocket("localhost", 10049);
         socket->sendData(config.getName().c_str()); // Identify the server after connection
         sleep(2);                                   // Wait for the server to identify
     }
@@ -56,8 +56,7 @@ int main(int argc, char const *argv[])
 
     while (1)
     {
-        cout << "MAIN" << endl;
-        sleep(10);
+        sleep(1);
         // event->sendEvent(event->createEvent("hello", "teste"));
     }
 

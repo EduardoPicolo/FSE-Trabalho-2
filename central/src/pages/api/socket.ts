@@ -10,6 +10,9 @@ const connectedSockets: Record<string, net.Socket> = {}
 
 const received = new MessageBuffer('\n')
 
+// fetch('http://localhost:3000/api/socket')
+// const server = net.createServer()
+
 interface ExtendedNextApiResponse<T = any> extends NextApiResponse<T> {
   server: net.Server
   socket:
@@ -48,7 +51,8 @@ const SocketHandler = (req: NextApiRequest, res: ExtendedNextApiResponse) => {
         // @ts-ignore
         res?.socket.server.io = io
 
-        const server = res?.server as net.Server
+        // const server = res?.server as net.Server
+        const server = net.createServer()
         server?.listen(10049, function () {
           console.log('Socket is listening on port 10049')
         })

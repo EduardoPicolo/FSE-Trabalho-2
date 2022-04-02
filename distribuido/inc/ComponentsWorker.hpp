@@ -25,7 +25,6 @@ public:
     ComponentsWorker(IO *io, EventController *eventController);
     ~ComponentsWorker();
     void start();
-    void initComponents();
     void initComponentWorker(component component);
 
 private:

@@ -6,10 +6,11 @@ import React, {
   useReducer,
   useState
 } from 'react'
+import cloneDeep from 'lodash/cloneDeep'
 
 import { ACTIONS, stateReducer, UpdateDeviceAction } from './reducer'
 
-type Status = boolean | number | 'pending'
+type Status = 'pending' | boolean
 
 export type Sensors = {
   occupation: number
@@ -38,9 +39,11 @@ export type FloorComponents = Devices & { sensors: Sensors } & {
   connected: boolean
 }
 
+type State2 = {
+  floors: Record<string, FloorComponents>
+}
+
 export type CentralServerType = {
-  //   groundFloor: FloorComponents
-  //   firstFloor: FloorComponents
   floors: Record<string, FloorComponents> | null
   addFloor: (floor: string) => void
   removeFloor: (floor: string) => void
@@ -51,9 +54,8 @@ export type CentralServerType = {
   handleEvent: (event: ServerEvent) => void
 }
 
-const defaultValues = {
+const defaultValues: FloorComponents = {
   connected: false,
-  occupation: 0,
   AC: 'pending',
   sprinkler: 'pending',
   bulbs: {
@@ -64,6 +66,7 @@ const defaultValues = {
   sensors: {
     temperature: 'pending',
     humidity: 'pending',
+    occupation: 0,
     presence: 'pending',
     smoke: 'pending',
     door: 'pending',
@@ -75,7 +78,7 @@ const defaultValues = {
 }
 
 export const CentralServerDefaultValues: CentralServerType = {
-  floors: null,
+  floors: {},
   addFloor: () => ({}),
   removeFloor: () => ({}),
   getFloors: [],
@@ -85,7 +88,7 @@ export const CentralServerDefaultValues: CentralServerType = {
   handleEvent: () => ({})
 }
 
-export const CentralServer = createContext<CentralServerType>(
+export const CentralServerContext = createContext<CentralServerType>(
   CentralServerDefaultValues
 )
 
@@ -93,7 +96,12 @@ export const CentralServerProvider: React.FC = ({ children }) => {
   const [state, dispatchEvent] = useReducer(stateReducer, {
     floors: {}
   })
-  //   const [state, dispatchEvent] = useReducer(stateReducer, {
+
+  //   const [state2, setState2] = useState<State2>({
+  //     floors: {}
+  //   })
+
+  //   const [stateeee, dispatchEventttt] = useReducerrrr(stateReducer, {
   //     floors: {
   //       Térreo: {
   //         connected: false,
@@ -129,15 +137,12 @@ export const CentralServerProvider: React.FC = ({ children }) => {
 
   console.log('CentralServerProvider: ', state)
 
-  const addFloor = useCallback(
-    (floor: string) => {
-      dispatchEvent({
-        type: ACTIONS.ADD_FLOOR,
-        payload: { [floor]: defaultValues }
-      })
-    },
-    [dispatchEvent]
-  )
+  const addFloor = useCallback((floor: string) => {
+    dispatchEvent({
+      type: ACTIONS.ADD_FLOOR,
+      payload: { [floor]: cloneDeep(defaultValues) }
+    })
+  }, [])
 
   const removeFloor = useCallback((floor: string) => {
     dispatchEvent({
@@ -198,7 +203,7 @@ export const CentralServerProvider: React.FC = ({ children }) => {
 
   const value = useMemo(
     () => ({
-      ...state,
+      floors: state.floors,
       getFloors,
       addFloor,
       removeFloor,
@@ -213,18 +218,20 @@ export const CentralServerProvider: React.FC = ({ children }) => {
       getFloors,
       handleEvent,
       removeFloor,
-      state,
+      state.floors,
       updateDevice
     ]
   )
 
   return (
-    <CentralServer.Provider value={value}>{children}</CentralServer.Provider>
+    <CentralServerContext.Provider value={value}>
+      {children}
+    </CentralServerContext.Provider>
   )
 }
 
 export function useCServer() {
-  const context = useContext(CentralServer)
+  const context = useContext(CentralServerContext)
 
   if (!context) {
     throw new Error('useCServer must be used within a CentralServerProvider')
