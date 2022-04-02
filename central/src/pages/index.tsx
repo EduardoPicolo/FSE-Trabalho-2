@@ -64,6 +64,8 @@ const Home: NextPage = () => {
           `Server ${msg.from} ${connected ? 'connected' : 'disconnected'}`
         )
         connected ? addFloor(msg?.from) : removeFloor(msg?.from)
+
+        console.log('FFF: ', getFloors)
         setCurrentFloor(
           connected ? msg?.from : getFloors.length > 0 ? getFloors[0] : null
         )
