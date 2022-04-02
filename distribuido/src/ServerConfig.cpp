@@ -35,6 +35,19 @@ std::vector<component> ServerConfig::getComponentsJSON(std::string componentType
             int pos = tag.find_last_of(' ');
             tempComponent.type += ' ' + tag.substr(pos + 2, tag.length());
         }
+        else if (tempComponent.type == "lampada")
+        {
+            int pos = tag.find_last_of(' ');
+            std::string type = tag.substr(pos + 2, tag.length());
+            if (type.find("0") == std::string::npos)
+            {
+                tempComponent.type += " 03";
+            }
+            else
+            {
+                tempComponent.type += ' ' + type;
+            }
+        }
 
         tempComponent.tag = tag;
         tempComponent.gpio = cJSON_GetObjectItem(data, "gpio")->valueint;
