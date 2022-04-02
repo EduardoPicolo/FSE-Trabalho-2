@@ -14,7 +14,7 @@ import {
   VStack
 } from '@chakra-ui/react'
 import { DefaultEventsMap } from 'socket.io/dist/typed-events'
-import { io, Socket } from 'socket.io-client'
+import { Socket } from 'socket.io-client'
 
 import { DevicesPanel } from '@components/DevicesPanel'
 import { FloorSwitcher } from '@components/FloorSwitcher'
@@ -24,18 +24,17 @@ import { StatsDisplay } from '@components/StatsDisplay'
 import { TemperaturePanel } from '@components/TemperaturePanel'
 import { useCServer } from '@contexts/CentralServer'
 
-let socket: Socket<DefaultEventsMap, DefaultEventsMap>
+export let socket2: Socket<DefaultEventsMap, DefaultEventsMap>
 
 const Home: NextPage = () => {
   const {
-    floors,
     addFloor,
     removeFloor,
     getFloors,
     currentFloor,
     setCurrentFloor,
-    updateDevice,
-    handleEvent
+    handleEvent,
+    socket
   } = useCServer()
 
   const handleFloorChange = useCallback(
@@ -46,44 +45,30 @@ const Home: NextPage = () => {
   )
 
   useEffect(() => {
-    const socketInitializer = async () => {
-      await fetch('/api/socket')
-      socket = io()
+    console.log('USE EFFECT!!')
+    if (!socket) return
+    socket?.on('connect', () => {
+      console.log('Central server started')
+    })
 
-      socket.on('connect', () => {
-        console.log('Central server started')
-      })
+    socket?.on('connection', (msg: ServerEvent) => {
+      const connected = Boolean(Number(msg?.value))
+      console.log(
+        `Server ${msg.from} ${connected ? 'connected' : 'disconnected'}`
+      )
+      connected ? addFloor(msg?.from) : removeFloor(msg?.from)
 
-      //   socket.on('update-temperature', (msg: any) => {
-      //     console.log('update-temperature', msg)
-      //   })
+      setCurrentFloor(
+        connected ? msg?.from : getFloors.length > 0 ? getFloors[0] : null
+      )
+      toast.info(`${msg.from} ${msg.value ? 'connected' : 'disconnected'}`)
+    })
 
-      socket.on('connection', (msg: ServerEvent) => {
-        const connected = Boolean(Number(msg?.value))
-        console.log(
-          `Server ${msg.from} ${connected ? 'connected' : 'disconnected'}`
-        )
-        connected ? addFloor(msg?.from) : removeFloor(msg?.from)
-
-        console.log('FFF: ', getFloors)
-        setCurrentFloor(
-          connected ? msg?.from : getFloors.length > 0 ? getFloors[0] : null
-        )
-        toast.info(`${msg.from} ${msg.value ? 'connected' : 'disconnected'}`)
-      })
-
-      socket.on('event', (event: ServerEvent) => {
-        handleEvent(event)
-      })
-    }
-
-    socketInitializer()
-
-    return () => {
-      socket.disconnect()
-    }
+    socket?.on('event', (event: ServerEvent) => {
+      handleEvent(event)
+    })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [socket])
 
   return (
     <>

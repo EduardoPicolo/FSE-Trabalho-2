@@ -12,12 +12,19 @@ import { UpdateDeviceAction } from '@contexts/CentralServer/reducer'
 const statusMap = (status: boolean) => (status ? 'Ligada' : 'Desligada')
 
 export const DevicesPanel: React.FC = () => {
-  const { currentFloor, floors, updateDevice } = useCServer()
+  const { currentFloor, floors, updateDevice, socket } = useCServer()
 
   const handleChange = useCallback(
-    (payload: Omit<UpdateDeviceAction['payload'], 'floor'>) => () =>
-      updateDevice({ ...payload, floor: currentFloor! }),
-    [currentFloor, updateDevice]
+    (payload: Omit<UpdateDeviceAction['payload'], 'floor'>) => () => {
+      if (!currentFloor) return
+      updateDevice({ floor: currentFloor, ...payload })
+      socket?.emit('input-event', {
+        to: currentFloor,
+        type: 'lampada 01', // TODO: common event type for both servers!
+        value: payload.status ? '1' : '0'
+      })
+    },
+    [currentFloor, socket, updateDevice]
   )
 
   const deviceStatus = useCallback(

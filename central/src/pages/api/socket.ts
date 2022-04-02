@@ -4,11 +4,7 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { Server } from 'socket.io'
 import { DefaultEventsMap } from 'socket.io/dist/typed-events'
 
-import { MessageBuffer } from '@utils/MessageBuffer'
-
 const connectedSockets: Record<string, net.Socket> = {}
-
-const received = new MessageBuffer('\n')
 
 // fetch('http://localhost:3000/api/socket')
 // const server = net.createServer()
@@ -34,15 +30,16 @@ const SocketHandler = (req: NextApiRequest, res: ExtendedNextApiResponse) => {
         const io = new Server(res?.socket?.server)
 
         io.on('connection', (socket) => {
-          socket.on('hello', (msg) => {
+          socket.on('input-event', (data) => {
             // console.log('HELLO SERVER: ', msg)
             // console.log('CONNECTIONS>: ', connectedSockets)
-            socket.emit('hello', 'hello FROM SERVER')
+            // socket.emit('hello', 'hello FROM SERVER')
+            const { to, type, value } = data
 
-            connectedSockets?.['Térreo'].write(
+            connectedSockets?.[to].write(
               JSON.stringify({
-                type: 'lampada',
-                value: 0
+                type,
+                value
               })
             )
           })
@@ -78,7 +75,7 @@ const SocketHandler = (req: NextApiRequest, res: ExtendedNextApiResponse) => {
           })
 
           connection.on('data', function (data) {
-            console.log('Received event: ' + data)
+            // console.log('Received event: ' + data)
             // received.push(data)
 
             // while (!received.isFinished()) {
@@ -88,6 +85,7 @@ const SocketHandler = (req: NextApiRequest, res: ExtendedNextApiResponse) => {
 
             // console.log('AFTER: ', received.getMessage())
 
+            //TODO: Find a better way to parse the 'cJSON' data
             fetch('http://localhost:3000/api/event', {
               method: 'POST',
               body: data

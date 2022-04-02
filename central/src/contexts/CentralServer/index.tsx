@@ -7,6 +7,10 @@ import React, {
   useState
 } from 'react'
 import cloneDeep from 'lodash/cloneDeep'
+import type { DefaultEventsMap } from 'socket.io/dist/typed-events'
+import { Socket } from 'socket.io-client'
+
+import { useSocket } from '@hooks/useSocket'
 
 import { ACTIONS, stateReducer, UpdateDeviceAction } from './reducer'
 
@@ -39,10 +43,6 @@ export type FloorComponents = Devices & { sensors: Sensors } & {
   connected: boolean
 }
 
-type State2 = {
-  floors: Record<string, FloorComponents>
-}
-
 export type CentralServerType = {
   floors: Record<string, FloorComponents> | null
   addFloor: (floor: string) => void
@@ -52,6 +52,7 @@ export type CentralServerType = {
   setCurrentFloor: (floor: string | null) => void
   updateDevice: (payload: UpdateDeviceAction['payload']) => void
   handleEvent: (event: ServerEvent) => void
+  socket: Socket<DefaultEventsMap, DefaultEventsMap> | null
 }
 
 const defaultValues: FloorComponents = {
@@ -85,7 +86,8 @@ export const CentralServerDefaultValues: CentralServerType = {
   currentFloor: null,
   setCurrentFloor: () => ({}),
   updateDevice: () => ({}),
-  handleEvent: () => ({})
+  handleEvent: () => ({}),
+  socket: null
 }
 
 export const CentralServerContext = createContext<CentralServerType>(
@@ -93,41 +95,11 @@ export const CentralServerContext = createContext<CentralServerType>(
 )
 
 export const CentralServerProvider: React.FC = ({ children }) => {
+  const socket = useSocket()
+
   const [state, dispatchEvent] = useReducer(stateReducer, {
     floors: {}
   })
-
-  //   const [state2, setState2] = useState<State2>({
-  //     floors: {}
-  //   })
-
-  //   const [stateeee, dispatchEventttt] = useReducerrrr(stateReducer, {
-  //     floors: {
-  //       Térreo: {
-  //         connected: false,
-  //         occupation: 0,
-  //         AC: true,
-  //         sprinkler: false,
-  //         bulbs: {
-  //           room01: true,
-  //           room02: false,
-  //           corridor: false
-  //         },
-  //         sensors: {
-  //           temperature: true,
-  //           humidity: true,
-  //           presence: false,
-  //           smoke: false,
-  //           door: true,
-  //           windows: {
-  //             room1: true,
-  //             room2: true
-  //           }
-  //         }
-  //       } as any,
-  //       '1oAndar': defaultValues as any
-  //     }
-  //   })
 
   const getFloors = useMemo(() => Object.keys(state.floors), [state.floors])
 
@@ -135,7 +107,7 @@ export const CentralServerProvider: React.FC = ({ children }) => {
     getFloors[0] || null
   )
 
-  console.log('CentralServerProvider: ', state)
+  //   console.log('CentralServerProvider: ', state)
 
   const addFloor = useCallback((floor: string) => {
     dispatchEvent({
@@ -181,6 +153,7 @@ export const CentralServerProvider: React.FC = ({ children }) => {
 
           if (value === '1')
             updateDevice({ floor: from, device: 'sprinkler', status: true })
+          else updateDevice({ floor: from, device: 'sprinkler', status: false })
 
           break
         case 'janela 01':
@@ -191,6 +164,21 @@ export const CentralServerProvider: React.FC = ({ children }) => {
           break
         case 'porta':
           payload.device = 'sensors.door'
+          break
+        case 'lampada 01':
+          payload.device = 'bulbs.room01'
+          break
+        case 'lampada 02':
+          payload.device = 'bulbs.room02'
+          break
+        case 'lampada 03':
+          payload.device = 'bulbs.corridor'
+          break
+        case 'ar-condicionado':
+          payload.device = 'AC'
+          break
+        case 'aspersor':
+          payload.device = 'sprinkler'
           break
         default:
           break
@@ -210,7 +198,8 @@ export const CentralServerProvider: React.FC = ({ children }) => {
       currentFloor,
       setCurrentFloor,
       updateDevice,
-      handleEvent
+      handleEvent,
+      socket
     }),
     [
       addFloor,
@@ -218,6 +207,7 @@ export const CentralServerProvider: React.FC = ({ children }) => {
       getFloors,
       handleEvent,
       removeFloor,
+      socket,
       state.floors,
       updateDevice
     ]

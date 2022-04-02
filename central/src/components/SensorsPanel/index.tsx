@@ -7,20 +7,16 @@ import { Grid, GridItem } from '@chakra-ui/react'
 import get from 'lodash/get'
 
 import { StatsDisplay } from '@components/StatsDisplay'
-import { FloorComponents, useCServer } from '@contexts/CentralServer'
+import { useCServer } from '@contexts/CentralServer'
 
 export const SensorsPanel: React.FC = () => {
   const { currentFloor, floors } = useCServer()
 
   const deviceStatus = useCallback(
-    (device: keyof FloorComponents['sensors']) => {
+    (device: string) => {
       if (!currentFloor) return 'pending'
 
-      const status = get(
-        floors,
-        `${currentFloor}.sensors.${device}`,
-        false
-      ) as unknown
+      const status = get(floors, `${currentFloor}.${device}`, false) as unknown
 
       return status
     },
@@ -32,45 +28,45 @@ export const SensorsPanel: React.FC = () => {
       <GridItem>
         <StatsDisplay
           label="Sensor da Porta de Entrada"
-          info={deviceStatus('door') ? 'Ligado' : 'Desligado'}
+          info={deviceStatus('sensors.door') ? 'Ligado' : 'Desligado'}
           icon={BsDoorOpen}
-          isLoaded={typeof deviceStatus('door') === 'boolean'}
+          isLoaded={typeof deviceStatus('sensors.door') === 'boolean'}
         />
       </GridItem>
 
       <GridItem>
         <StatsDisplay
           label="Sensor da Janela 01"
-          info={deviceStatus('windows.room1') ? 'Ligado' : 'Desligado'}
+          info={deviceStatus('sensors.windows.room1') ? 'Ligado' : 'Desligado'}
           icon={GiWindow}
-          isLoaded={typeof deviceStatus('windows.room1') === 'boolean'}
+          isLoaded={typeof deviceStatus('sensors.windows.room1') === 'boolean'}
         />
       </GridItem>
 
       <GridItem>
         <StatsDisplay
           label="Sensor de Fumaça"
-          info={deviceStatus('smoke') ? 'Ligado' : 'Desligado'}
+          info={deviceStatus('sensors.smoke') ? 'Ligado' : 'Desligado'}
           icon={WiSmoke}
-          isLoaded={typeof deviceStatus('smoke') === 'boolean'}
+          isLoaded={typeof deviceStatus('sensors.smoke') === 'boolean'}
         />
       </GridItem>
 
       <GridItem>
         <StatsDisplay
           label="Sensor de Presença"
-          info={deviceStatus('presence') ? 'Ligado' : 'Desligado'}
+          info={deviceStatus('sensors.presence') ? 'Ligado' : 'Desligado'}
           icon={GiMovementSensor}
-          isLoaded={typeof deviceStatus('presence') === 'boolean'}
+          isLoaded={typeof deviceStatus('sensors.presence') === 'boolean'}
         />
       </GridItem>
 
       <GridItem>
         <StatsDisplay
           label="Sensor da Janela 02"
-          info={deviceStatus('windows.room2') ? 'Ligado' : 'Desligado'}
+          info={deviceStatus('sensors.windows.room2') ? 'Ligado' : 'Desligado'}
           icon={GiWindow}
-          isLoaded={typeof deviceStatus('windows.room2') === 'boolean'}
+          isLoaded={typeof deviceStatus('sensors.windows.room2') === 'boolean'}
         />
       </GridItem>
 
