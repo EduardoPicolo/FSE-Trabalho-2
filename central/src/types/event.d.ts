@@ -13,5 +13,6 @@ interface ServerEvent {
     | 'aspersor'
     | 'contagemEntra'
     | 'contagemSai'
+    | 'dht'
   value: string
 }

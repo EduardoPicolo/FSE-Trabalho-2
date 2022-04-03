@@ -12,7 +12,9 @@ export const mapEventToDevice = {
   aspersor: 'sprinkler',
   'lampada 01': 'bulbs.room01',
   'lampada 02': 'bulbs.room02',
-  'lampada 03': 'bulbs.corridor'
+  'lampada 03': 'bulbs.corridor',
+
+  dht: 'sensors.temperature'
 }
 
 export const mapDeviceToEvent = invert(mapEventToDevice)

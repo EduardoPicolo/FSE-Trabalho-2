@@ -18,18 +18,21 @@
 #include "EventController.hpp"
 #include "Component.hpp"
 #include "IO.hpp"
+#include "dht22.hpp"
 
 class ComponentsWorker
 {
 public:
-    ComponentsWorker(IO *io, EventController *eventController);
+    ComponentsWorker(IO *io, EventController *eventController, component dht22);
     ~ComponentsWorker();
     void start();
     void initInputWorker(component component);
     void initOutputWorker(component component);
+    void DHT22Worker();
 
 private:
     IO *io_;
+    component dht22_;
 
     static EventController *event_;
 

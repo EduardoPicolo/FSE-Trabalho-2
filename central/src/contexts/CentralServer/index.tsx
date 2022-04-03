@@ -12,7 +12,12 @@ import { Socket } from 'socket.io-client'
 
 import { useSocket } from '@hooks/useSocket'
 
-import { ACTIONS, stateReducer, UpdateDeviceAction } from './reducer'
+import {
+  ACTIONS,
+  stateReducer,
+  UpdateDeviceAction,
+  UpdateTemperatureAction
+} from './reducer'
 import { mapEventToDevice } from './utils'
 
 type Status = 'pending' | boolean | 'not-connected'
@@ -20,8 +25,8 @@ type Status = 'pending' | boolean | 'not-connected'
 export type Sensors = {
   countIn: Status
   countOut: Status
-  temperature: Status
-  humidity: Status
+  temperature: Status | number
+  humidity: Status | number
   presence: Status
   smoke: Status
   door: Status
@@ -54,8 +59,22 @@ export type CentralServerType = {
   currentFloor: string | null
   setCurrentFloor: (floor: string | null) => void
   updateDevice: (payload: UpdateDeviceAction['payload']) => void
+  updateTemperature: (data: ServerEvent) => void
   handleEvent: (event: ServerEvent) => void
   socket: Socket<DefaultEventsMap, DefaultEventsMap> | null
+}
+
+export const CentralServerDefaultValues: CentralServerType = {
+  floors: {},
+  addFloor: () => ({}),
+  removeFloor: () => ({}),
+  getFloors: [],
+  currentFloor: null,
+  setCurrentFloor: () => ({}),
+  updateDevice: () => ({}),
+  updateTemperature: () => ({}),
+  handleEvent: () => ({}),
+  socket: null
 }
 
 const defaultValues: FloorComponents = {
@@ -83,18 +102,6 @@ const defaultValues: FloorComponents = {
   }
 }
 
-export const CentralServerDefaultValues: CentralServerType = {
-  floors: {},
-  addFloor: () => ({}),
-  removeFloor: () => ({}),
-  getFloors: [],
-  currentFloor: null,
-  setCurrentFloor: () => ({}),
-  updateDevice: () => ({}),
-  handleEvent: () => ({}),
-  socket: null
-}
-
 export const CentralServerContext = createContext<CentralServerType>(
   CentralServerDefaultValues
 )
@@ -105,6 +112,14 @@ export const CentralServerProvider: React.FC = ({ children }) => {
   const [state, dispatchEvent] = useReducer(stateReducer, {
     floors: {}
   })
+
+  const [temperature, setTemperature] = useState<number | 'pending'>('pending')
+  const [humidity, setHumidity] = useState<number | 'pending'>('pending')
+
+  const [temperature2, setTemperature2] = useState<number | 'pending'>(
+    'pending'
+  )
+  const [humidity2, setHumidity2] = useState<number | 'pending'>('pending')
 
   const getFloors = useMemo(() => Object.keys(state.floors), [state.floors])
 
@@ -137,7 +152,7 @@ export const CentralServerProvider: React.FC = ({ children }) => {
 
   const handleEvent = useCallback(
     ({ from, type, value }: ServerEvent) => {
-      console.log('HandleEvent: ', { from, type, value })
+      console.log('Received event: ', { from, type, value })
 
       const payload = {
         floor: from,
@@ -150,6 +165,26 @@ export const CentralServerProvider: React.FC = ({ children }) => {
     [updateDevice]
   )
 
+  const updateTemperature = useCallback((event: ServerEvent) => {
+    let data
+
+    try {
+      data = JSON.parse(event.value) as UpdateTemperatureAction['payload']
+      console.log('TESTE: ', data)
+    } catch (error) {
+      console.error('Error parsing dht data: ', error)
+    }
+
+    dispatchEvent({
+      type: ACTIONS.UPDATE_TEMPERATURE,
+      payload: {
+        floor: event.from,
+        temperature: data?.temperature || -10,
+        humidity: data?.humidity || -10
+      }
+    })
+  }, [])
+
   const value = useMemo(
     () => ({
       floors: state.floors,
@@ -159,6 +194,7 @@ export const CentralServerProvider: React.FC = ({ children }) => {
       currentFloor,
       setCurrentFloor,
       updateDevice,
+      updateTemperature,
       handleEvent,
       socket
     }),
@@ -170,7 +206,8 @@ export const CentralServerProvider: React.FC = ({ children }) => {
       removeFloor,
       socket,
       state.floors,
-      updateDevice
+      updateDevice,
+      updateTemperature
     ]
   )
 

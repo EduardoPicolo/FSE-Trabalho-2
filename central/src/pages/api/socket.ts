@@ -71,6 +71,8 @@ const SocketHandler = (req: NextApiRequest, res: ExtendedNextApiResponse) => {
               // @ts-ignore
               if (payload.type === 'confirmacao') {
                 io.emit('confirmation', payload)
+              } else if (payload.type === 'dht') {
+                io.emit('dht', payload)
               } else io.emit('event', payload)
             } catch (error) {
               console.error('Invalid event')

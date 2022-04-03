@@ -31,18 +31,27 @@ int main(int argc, char const *argv[])
 {
     signal(SIGINT, quit);
 
+    if (argc < 2)
+    {
+        std::cout << "O arquivo de inicializacao precisa ser passado como parametro" << std::endl;
+        exit(1);
+    }
+
+    // wiringPiSetup();
+
     ServerConfig config = ServerConfig(argv[1]);
     Socket *socket = Socket::getInstance(); // Socket
-
     IO io = IO(config.getComponentsJSON("inputs"), config.getComponentsJSON("outputs"));
     EventController eventController = EventController(config.getName(), &io);
-    ComponentsWorker worker = ComponentsWorker(&io, &eventController);
+
+    component dth = config.getComponentsJSON("sensor_temperatura")[0];
+    ComponentsWorker worker = ComponentsWorker(&io, &eventController, dth);
 
     try
     {
         socket->connectSocket("localhost", 10049);
         socket->sendData(config.getName().c_str()); // Identify the server after connection
-        sleep(2);                                   // Wait for the server to identify
+        sleep(1);                                   // Wait for the server to identify
     }
     catch (Exception &e)
     {
@@ -54,6 +63,10 @@ int main(int argc, char const *argv[])
 
     worker.start();
 
+    // std::thread dht22Thread(&ComponentsWorker::DHT22Worker, worker);
+
+    // eventThread.join();
+    // dht22Thread.join();
     while (1)
     {
         sleep(1);

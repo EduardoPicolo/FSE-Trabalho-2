@@ -15,10 +15,11 @@ int ComponentsWorker::bulbCorridor_ = 0;
 int ComponentsWorker::AC_ = 0;
 int ComponentsWorker::sprinkler_ = 0;
 
-ComponentsWorker::ComponentsWorker(IO *io, EventController *eventController)
+ComponentsWorker::ComponentsWorker(IO *io, EventController *eventController, component dht22)
 {
     io_ = io;
     event_ = eventController;
+    dht22_ = dht22;
 }
 
 void ComponentsWorker::start()
@@ -33,7 +34,7 @@ void ComponentsWorker::start()
         component.state = initialState;
         event_->sendEvent(event_->createEvent(component.type.c_str(), std::to_string(initialState).c_str()));
         initInputWorker(component);
-        usleep(500000); // sending to many events at the same time can cause issues to the NodeJS Buffer
+        sleep(1); // sending to many events at the same time can cause issues to the NodeJS Buffer
     }
 
     for (component component : io_->getOutputs())
@@ -45,7 +46,23 @@ void ComponentsWorker::start()
         component.state = initialState;
         event_->sendEvent(event_->createEvent(component.type.c_str(), std::to_string(initialState).c_str()));
         initOutputWorker(component);
-        usleep(500000); // sending to many events at the same time can cause issues to the NodeJS Buffer
+        sleep(1); // sending to many events at the same time can cause issues to the NodeJS Buffer
+    }
+}
+
+void ComponentsWorker::DHT22Worker()
+{
+
+    wiringPiSetup();
+    std::cout << "DHT22Worker starting..." << std::endl;
+    int pin = io_->toWiringPiPin(dht22_.gpio);
+
+    while (1)
+    {
+        DHT22_data data = read_dht_data(pin);
+        std::string payload = "{\"temperature\":" + std::to_string(data.temperature) + ",\"humidity\":" + std::to_string(data.humidity) + "}";
+        event_->sendEvent(event_->createEvent("dht", payload.c_str()));
+        sleep(1);
     }
 }
 
