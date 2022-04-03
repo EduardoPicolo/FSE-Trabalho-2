@@ -65,6 +65,8 @@ export const stateReducer = (state: State, action: Action): State => {
     case ACTIONS.UPDATE_TEMPERATURE: {
       const { floor, temperature, humidity } = action.payload
 
+      if (temperature === -1 || humidity === -1) return state
+
       const updatedFloor = {
         ...state.floors?.[floor],
         sensors: { ...state.floors?.[floor]?.sensors, temperature, humidity }

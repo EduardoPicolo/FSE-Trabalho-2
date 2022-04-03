@@ -55,11 +55,14 @@ const Home: NextPage = () => {
       console.log(
         `Server ${msg.from} ${connected ? 'connected' : 'disconnected'}`
       )
-      connected ? addFloor(msg?.from) : removeFloor(msg?.from)
 
-      setCurrentFloor(
-        connected ? msg?.from : getFloors.length > 0 ? getFloors[0] : null
-      )
+      if (connected) {
+        addFloor(msg?.from)
+        setCurrentFloor(msg?.from)
+      } else {
+        removeFloor(msg?.from)
+      }
+
       toast.info(`${msg.from} ${msg.value ? 'connected' : 'disconnected'}`)
     })
 

@@ -25,32 +25,12 @@ export const SensorsPanel: React.FC = () => {
 
   return (
     <Grid templateColumns="1fr 1fr 1fr" gap={8}>
-      {deviceStatus('sensors.door') !== 'not-connected' && (
-        <GridItem>
-          <StatsDisplay
-            label="Sensor da Porta de Entrada"
-            info={deviceStatus('sensors.door') ? 'Ligado' : 'Desligado'}
-            icon={BsDoorOpen}
-            isLoaded={typeof deviceStatus('sensors.door') === 'boolean'}
-          />
-        </GridItem>
-      )}
-
       <GridItem>
         <StatsDisplay
           label="Sensor da Janela 01"
           info={deviceStatus('sensors.windows.room1') ? 'Ligado' : 'Desligado'}
           icon={GiWindow}
           isLoaded={typeof deviceStatus('sensors.windows.room1') === 'boolean'}
-        />
-      </GridItem>
-
-      <GridItem>
-        <StatsDisplay
-          label="Sensor de Fumaça"
-          info={deviceStatus('sensors.smoke') ? 'Ligado' : 'Desligado'}
-          icon={WiSmoke}
-          isLoaded={typeof deviceStatus('sensors.smoke') === 'boolean'}
         />
       </GridItem>
 
@@ -65,6 +45,15 @@ export const SensorsPanel: React.FC = () => {
 
       <GridItem>
         <StatsDisplay
+          label="Sensor de Fumaça"
+          info={deviceStatus('sensors.smoke') ? 'Ligado' : 'Desligado'}
+          icon={WiSmoke}
+          isLoaded={typeof deviceStatus('sensors.smoke') === 'boolean'}
+        />
+      </GridItem>
+
+      <GridItem>
+        <StatsDisplay
           label="Sensor da Janela 02"
           info={deviceStatus('sensors.windows.room2') ? 'Ligado' : 'Desligado'}
           icon={GiWindow}
@@ -72,17 +61,24 @@ export const SensorsPanel: React.FC = () => {
         />
       </GridItem>
 
-      {deviceStatus('sprinkler') !== 'not-connected' && (
-        <GridItem>
-          <StatsDisplay
-            label="Aspersor de Água"
-            info={deviceStatus('sprinkler') ? 'Ligado' : 'Desligado'}
-            helpText={deviceStatus('smoke') ? 'Fumaça detectada' : 'Sem fumaça'}
-            icon={MdOutlineLocalFireDepartment}
-            isLoaded={typeof deviceStatus('sprinkler') === 'boolean'}
-          />
-        </GridItem>
-      )}
+      <GridItem>
+        <StatsDisplay
+          label="Sensor da Porta de Entrada"
+          info={deviceStatus('sensors.door') ? 'Ligado' : 'Desligado'}
+          icon={BsDoorOpen}
+          isLoaded={typeof deviceStatus('sensors.door') === 'boolean'}
+        />
+      </GridItem>
+
+      <GridItem>
+        <StatsDisplay
+          label="Aspersor de Água"
+          info={deviceStatus('sprinkler') ? 'Ligado' : 'Desligado'}
+          helpText={deviceStatus('smoke') ? 'Fumaça detectada' : 'Sem fumaça'}
+          icon={MdOutlineLocalFireDepartment}
+          isLoaded={typeof deviceStatus('sprinkler') === 'boolean'}
+        />
+      </GridItem>
     </Grid>
   )
 }

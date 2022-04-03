@@ -63,7 +63,7 @@ int main(int argc, char const *argv[])
 
     worker.start();
 
-    // std::thread dht22Thread(&ComponentsWorker::DHT22Worker, worker);
+    std::thread dht22Thread(&ComponentsWorker::DHT22Worker, worker);
 
     // eventThread.join();
     // dht22Thread.join();

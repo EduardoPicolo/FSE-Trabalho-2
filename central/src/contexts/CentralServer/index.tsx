@@ -136,12 +136,16 @@ export const CentralServerProvider: React.FC = ({ children }) => {
     })
   }, [])
 
-  const removeFloor = useCallback((floor: string) => {
-    dispatchEvent({
-      type: ACTIONS.REMOVE_FLOOR,
-      payload: floor
-    })
-  }, [])
+  const removeFloor = useCallback(
+    (floor: string) => {
+      dispatchEvent({
+        type: ACTIONS.REMOVE_FLOOR,
+        payload: floor
+      })
+      setCurrentFloor(Object.keys(state?.floors)?.[0] || null)
+    },
+    [state.floors]
+  )
 
   const updateDevice = useCallback((payload: UpdateDeviceAction['payload']) => {
     dispatchEvent({
@@ -170,7 +174,6 @@ export const CentralServerProvider: React.FC = ({ children }) => {
 
     try {
       data = JSON.parse(event.value) as UpdateTemperatureAction['payload']
-      console.log('TESTE: ', data)
     } catch (error) {
       console.error('Error parsing dht data: ', error)
     }

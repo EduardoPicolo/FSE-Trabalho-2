@@ -1,7 +1,7 @@
-import React, { ReactText, useCallback, useEffect, useRef } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import { MdOutlineAir } from 'react-icons/md'
 import { RiLightbulbFlashLine } from 'react-icons/ri'
-import { toast, Zoom } from 'react-toastify'
+import { toast } from 'react-toastify'
 import { Box, Wrap, WrapItem } from '@chakra-ui/react'
 import get from 'lodash/get'
 
@@ -16,17 +16,13 @@ const statusMap = (status: boolean) => (status ? 'Ligada' : 'Desligada')
 export const DevicesPanel: React.FC = () => {
   const { currentFloor, floors, updateDevice, socket } = useCServer()
 
-  const toastId = useRef<ReactText | null>(null)
-
   useEffect(() => {
     if (!socket) return
 
     socket?.on('confirmation', (event: ServerEvent) => {
-      if (!toastId.current) return
-      toast.update(toastId.current, {
+      toast.success(event.value, {
         type: toast.TYPE.SUCCESS,
         theme: 'dark',
-        render: event.value,
         autoClose: 1500,
         hideProgressBar: true,
         pauseOnHover: true
@@ -44,16 +40,6 @@ export const DevicesPanel: React.FC = () => {
         type: mapDeviceToEvent[payload.device], // TODO: common event type for both servers!
         value: payload.status ? '1' : '0'
       })
-      toastId.current = toast(
-        `${payload.status ? 'Ligando' : 'Desligando'} ${
-          mapDeviceToEvent[payload.device]
-        }`,
-        {
-          autoClose: false,
-          theme: 'dark',
-          transition: Zoom
-        }
-      )
     },
     [currentFloor, socket, updateDevice]
   )

@@ -35,14 +35,16 @@ export const TemperaturePanel: React.FC = () => {
     <HStack alignItems="flex-start" gap={8}>
       <StatsDisplay
         label="Temperatura"
-        info={<span>{data('temperature')}&deg;C</span>}
+        info={
+          <span>{(data('temperature') as number)?.toFixed?.(1)}&deg;C</span>
+        }
         helpText=""
         icon={RiTempColdLine}
         isLoaded={data('temperature') !== 'pending'}
       />
       <StatsDisplay
         label="Umidade"
-        info={<span>{data('humidity')}%</span>}
+        info={<span>{(data('humidity') as number)?.toFixed?.(1)}%</span>}
         helpText=""
         icon={BsDropletHalf}
         isLoaded={data('humidity') !== 'pending'}
