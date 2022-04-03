@@ -15,11 +15,11 @@
 // #include "IO.hpp"
 #include "Component.hpp"
 
-struct address
+typedef struct address
 {
     std::string ip;
     int port;
-};
+} address;
 
 class ServerConfig
 {
@@ -34,7 +34,7 @@ public:
 private:
     cJSON *config_;
     std::string name_;
-    address remoteAddress_;
+    address address_;
     void getNameJSON(cJSON *config_json);
     void getAddressJSON(cJSON *config_json);
 };

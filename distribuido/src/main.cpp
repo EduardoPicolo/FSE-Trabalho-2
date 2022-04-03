@@ -49,7 +49,7 @@ int main(int argc, char const *argv[])
 
     try
     {
-        socket->connectSocket("localhost", 10049);
+        socket->connectSocket("localhost", config.getAddress().port);
         socket->sendData(config.getName().c_str()); // Identify the server after connection
         sleep(1);                                   // Wait for the server to identify
     }
@@ -65,13 +65,13 @@ int main(int argc, char const *argv[])
 
     std::thread dht22Thread(&ComponentsWorker::DHT22Worker, worker);
 
-    // eventThread.join();
-    // dht22Thread.join();
-    while (1)
-    {
-        sleep(1);
-        // event->sendEvent(event->createEvent("hello", "teste"));
-    }
+    eventThread.join();
+    dht22Thread.join();
+    // while (1)
+    // {
+    //     sleep(1);
+    //     // event->sendEvent(event->createEvent("hello", "teste"));
+    // }
 
     return 0;
 }

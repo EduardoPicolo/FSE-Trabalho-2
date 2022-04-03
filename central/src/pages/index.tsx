@@ -117,7 +117,7 @@ const Home: NextPage = () => {
           <VStack alignItems="flex-start" gap="12" maxWidth="600px">
             <TemperaturePanel />
 
-            <Box style={{ marginTop: '-1rem' }}>
+            <Box width="100%" style={{ marginTop: '-1rem' }}>
               <Text
                 fontSize="smaller"
                 color="gray.500"

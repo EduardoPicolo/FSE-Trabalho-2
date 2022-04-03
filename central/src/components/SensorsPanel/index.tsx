@@ -1,7 +1,6 @@
 import React, { useCallback } from 'react'
 import { BsDoorOpen } from 'react-icons/bs'
 import { GiMovementSensor, GiWindow } from 'react-icons/gi'
-import { MdOutlineLocalFireDepartment } from 'react-icons/md'
 import { WiSmoke } from 'react-icons/wi'
 import { Grid, GridItem } from '@chakra-ui/react'
 import get from 'lodash/get'
@@ -67,16 +66,6 @@ export const SensorsPanel: React.FC = () => {
           info={deviceStatus('sensors.door') ? 'Ligado' : 'Desligado'}
           icon={BsDoorOpen}
           isLoaded={typeof deviceStatus('sensors.door') === 'boolean'}
-        />
-      </GridItem>
-
-      <GridItem>
-        <StatsDisplay
-          label="Aspersor de Água"
-          info={deviceStatus('sprinkler') ? 'Ligado' : 'Desligado'}
-          helpText={deviceStatus('smoke') ? 'Fumaça detectada' : 'Sem fumaça'}
-          icon={MdOutlineLocalFireDepartment}
-          isLoaded={typeof deviceStatus('sprinkler') === 'boolean'}
         />
       </GridItem>
     </Grid>

@@ -13,8 +13,8 @@ void ServerConfig::getAddressJSON(cJSON *config_json)
     cJSON *ip_json = cJSON_GetObjectItemCaseSensitive(config_json, "ip_servidor_central");
     cJSON *port_json = cJSON_GetObjectItemCaseSensitive(config_json, "porta_servidor_central");
 
-    remoteAddress_.ip = ip_json->valuestring;
-    remoteAddress_.port = port_json->valueint;
+    address_.ip = ip_json->valuestring;
+    address_.port = port_json->valueint;
 }
 
 std::vector<component> ServerConfig::getComponentsJSON(std::string componentType)
@@ -89,6 +89,11 @@ ServerConfig::ServerConfig(const char *path)
 std::string ServerConfig::getName()
 {
     return name_;
+}
+
+address ServerConfig::getAddress()
+{
+    return address_;
 }
 
 ServerConfig::~ServerConfig()

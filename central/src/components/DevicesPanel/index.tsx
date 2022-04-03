@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect } from 'react'
-import { MdOutlineAir } from 'react-icons/md'
+import { MdOutlineAir, MdOutlineLocalFireDepartment } from 'react-icons/md'
 import { RiLightbulbFlashLine } from 'react-icons/ri'
 import { toast } from 'react-toastify'
-import { Box, Wrap, WrapItem } from '@chakra-ui/react'
+import { Box, Grid, GridItem } from '@chakra-ui/react'
 import get from 'lodash/get'
 
 import { StatsDisplay } from '@components/StatsDisplay'
@@ -56,8 +56,8 @@ export const DevicesPanel: React.FC = () => {
   )
 
   return (
-    <Wrap spacing={8}>
-      <WrapItem>
+    <Grid templateColumns="1fr 1fr 1fr" gap={8}>
+      <GridItem marginBottom={4}>
         <StatsDisplay
           label="Ar-condicionado"
           info={
@@ -76,9 +76,9 @@ export const DevicesPanel: React.FC = () => {
           icon={MdOutlineAir}
           isLoaded={typeof deviceStatus('AC') === 'boolean'}
         />
-      </WrapItem>
+      </GridItem>
 
-      <WrapItem>
+      <GridItem marginBottom={4}>
         <StatsDisplay
           label="Lâmpada da Sala 01"
           info={
@@ -97,9 +97,9 @@ export const DevicesPanel: React.FC = () => {
           icon={RiLightbulbFlashLine}
           isLoaded={typeof deviceStatus('bulbs.room01') === 'boolean'}
         />
-      </WrapItem>
+      </GridItem>
 
-      <WrapItem>
+      <GridItem marginBottom={4}>
         <StatsDisplay
           label="Lâmpada da Sala 02"
           info={
@@ -118,9 +118,9 @@ export const DevicesPanel: React.FC = () => {
           icon={RiLightbulbFlashLine}
           isLoaded={typeof deviceStatus('bulbs.room02') === 'boolean'}
         />
-      </WrapItem>
+      </GridItem>
 
-      <WrapItem>
+      <GridItem>
         <StatsDisplay
           label="Lâmpadas do Corredor"
           info={
@@ -139,7 +139,19 @@ export const DevicesPanel: React.FC = () => {
           icon={RiLightbulbFlashLine}
           isLoaded={typeof deviceStatus('bulbs.corridor') === 'boolean'}
         />
-      </WrapItem>
-    </Wrap>
+      </GridItem>
+
+      <GridItem>
+        <StatsDisplay
+          label="Aspersor de Água"
+          info={deviceStatus('sprinkler') ? 'Ligado' : 'Desligado'}
+          helpText={
+            deviceStatus('sensors.smoke') ? 'Fumaça detectada' : 'Sem fumaça'
+          }
+          icon={MdOutlineLocalFireDepartment}
+          isLoaded={typeof deviceStatus('sprinkler') === 'boolean'}
+        />
+      </GridItem>
+    </Grid>
   )
 }
