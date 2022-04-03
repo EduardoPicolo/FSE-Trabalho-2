@@ -18,7 +18,7 @@ import {
   UpdateDeviceAction,
   UpdateTemperatureAction
 } from './reducer'
-import { mapEventToDevice } from './utils'
+import { mapDeviceToEvent, mapEventToDevice } from './utils'
 
 type Status = 'pending' | boolean | 'not-connected'
 
@@ -113,14 +113,6 @@ export const CentralServerProvider: React.FC = ({ children }) => {
     floors: {}
   })
 
-  const [temperature, setTemperature] = useState<number | 'pending'>('pending')
-  const [humidity, setHumidity] = useState<number | 'pending'>('pending')
-
-  const [temperature2, setTemperature2] = useState<number | 'pending'>(
-    'pending'
-  )
-  const [humidity2, setHumidity2] = useState<number | 'pending'>('pending')
-
   const getFloors = useMemo(() => Object.keys(state.floors), [state.floors])
 
   const [currentFloor, setCurrentFloor] = useState<string | null>(
@@ -147,12 +139,23 @@ export const CentralServerProvider: React.FC = ({ children }) => {
     [state.floors]
   )
 
-  const updateDevice = useCallback((payload: UpdateDeviceAction['payload']) => {
-    dispatchEvent({
-      type: ACTIONS.UPDATE_DEVICE,
-      payload
-    })
-  }, [])
+  const updateDevice = useCallback(
+    (payload: UpdateDeviceAction['payload']) => {
+      dispatchEvent({
+        type: ACTIONS.UPDATE_DEVICE,
+        payload
+      })
+
+      if (payload.device === 'sensors.smoke') {
+        socket?.emit?.('input-event', {
+          to: payload.floor,
+          type: mapDeviceToEvent['sprinkler'], // TODO: common event type for both servers!
+          value: payload.status ? '1' : '0'
+        })
+      }
+    },
+    [socket]
+  )
 
   const handleEvent = useCallback(
     ({ from, type, value }: ServerEvent) => {

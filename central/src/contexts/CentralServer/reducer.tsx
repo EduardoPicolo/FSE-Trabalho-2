@@ -53,7 +53,7 @@ export const stateReducer = (state: State, action: Action): State => {
 
       if (device === 'sensors.smoke') {
         if (status) console.log('Smoke detected!')
-        set(state.floors?.[floor], 'sensors.smoke', status)
+        set(state.floors?.[floor], 'sprinkler', status)
       }
 
       const updatedFloor = set(state.floors?.[floor], device, status)

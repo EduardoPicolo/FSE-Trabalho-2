@@ -9,11 +9,6 @@ int ComponentsWorker::door_ = 0;
 int ComponentsWorker::totalPeople_ = 0;
 int ComponentsWorker::peopleGroundFloor_ = 0;
 int ComponentsWorker::peopleFirstFloor_ = 0;
-int ComponentsWorker::bulb01_ = 0;
-int ComponentsWorker::bulb02_ = 0;
-int ComponentsWorker::bulbCorridor_ = 0;
-int ComponentsWorker::AC_ = 0;
-int ComponentsWorker::sprinkler_ = 0;
 
 ComponentsWorker::ComponentsWorker(IO *io, EventController *eventController, component dht22)
 {
@@ -24,42 +19,38 @@ ComponentsWorker::ComponentsWorker(IO *io, EventController *eventController, com
 
 void ComponentsWorker::start()
 {
-    wiringPiSetup();
 
     for (component component : io_->getInputs())
     {
-        component.gpio = io_->toWiringPiPin(component.gpio);
         pinMode(component.gpio, INPUT);
         int initialState = digitalRead(component.gpio);
         component.state = initialState;
         event_->sendEvent(event_->createEvent(component.type.c_str(), std::to_string(initialState).c_str()));
         initInputWorker(component);
-        sleep(1); // sending to many events at the same time can cause issues to the NodeJS Buffer
+        delay(1000);
+        // sleep(1); // sending to many events at the same time can cause issues to the NodeJS Buffer
     }
 
     for (component component : io_->getOutputs())
     {
-        component.gpio = io_->toWiringPiPin(component.gpio);
         pinMode(component.gpio, OUTPUT);
         digitalWrite(component.gpio, LOW);
         int initialState = 0;
         component.state = initialState;
         event_->sendEvent(event_->createEvent(component.type.c_str(), std::to_string(initialState).c_str()));
-        initOutputWorker(component);
-        sleep(1); // sending to many events at the same time can cause issues to the NodeJS Buffer
+        delay(1000);
+        // sleep(1); // sending to many events at the same time can cause issues to the NodeJS Buffer
     }
 }
 
 void ComponentsWorker::DHT22Worker()
 {
 
-    wiringPiSetup();
     std::cout << "DHT22Worker starting..." << std::endl;
-    int pin = io_->toWiringPiPin(dht22_.gpio);
 
     while (1)
     {
-        DHT22_data data = read_dht_data(pin);
+        DHT22_data data = read_dht_data(dht22_.gpio);
         std::string payload = "{\"temperature\":" + std::to_string(data.temperature) + ",\"humidity\":" + std::to_string(data.humidity) + "}";
         event_->sendEvent(event_->createEvent("dht", payload.c_str()));
         sleep(1);
@@ -100,39 +91,6 @@ void ComponentsWorker::initInputWorker(component component)
     {
         door_ = component.state;
         wiringPiISR(component.gpio, INT_EDGE_BOTH, DoorSensorHandler);
-    }
-}
-
-void ComponentsWorker::initOutputWorker(component component)
-{
-
-    if (component.type.find("lampada") != std::string::npos)
-    {
-        if (component.tag.find("01") != std::string::npos)
-        {
-            bulb01_ = component.state;
-            wiringPiISR(component.gpio, INT_EDGE_BOTH, Bulb01Handler);
-        }
-        else if (component.tag.find("02") != std::string::npos)
-        {
-            bulb02_ = component.state;
-            wiringPiISR(component.gpio, INT_EDGE_BOTH, Bulb02Handler);
-        }
-        else
-        {
-            bulbCorridor_ = component.state;
-            wiringPiISR(component.gpio, INT_EDGE_BOTH, BulbCorridorHandler);
-        }
-    }
-    else if (component.type == "ar-condicionado")
-    {
-        AC_ = component.state;
-        wiringPiISR(component.gpio, INT_EDGE_BOTH, ACHandler);
-    }
-    else if (component.type == "aspersor")
-    {
-        sprinkler_ = component.state;
-        wiringPiISR(component.gpio, INT_EDGE_BOTH, SprinklerHandler);
     }
 }
 
@@ -211,87 +169,6 @@ void ComponentsWorker::SmokeSensorHandler()
         std::cout << "Sensor de fumaça desligado" << std::endl;
     }
     event_->sendEvent(event_->createEvent("fumaca", std::to_string(smokeSensor_).c_str()));
-}
-void ComponentsWorker::Bulb01Handler()
-{
-    if (bulb01_ == 0)
-    {
-        bulb01_ = 1;
-        std::cout << "Lâmpada da Sala 01 aberta" << std::endl;
-    }
-    else if (bulb01_ == 1)
-    {
-        bulb01_ = 0;
-        std::cout << "Lâmpada da Sala 01 fechada" << std::endl;
-    }
-
-    std::string eventType = "lampada 01";
-
-    event_->sendEvent(event_->createEvent(eventType.c_str(), std::to_string(bulb01_).c_str()));
-}
-void ComponentsWorker::Bulb02Handler()
-{
-    if (bulb02_ == 0)
-    {
-        bulb02_ = 1;
-        std::cout << "Lâmpada da Sala 02 aberta" << std::endl;
-    }
-    else if (bulb02_ == 1)
-    {
-        bulb02_ = 0;
-        std::cout << "Lâmpada da Sala 02 fechada" << std::endl;
-    }
-
-    std::string eventType = "lampada 02";
-
-    event_->sendEvent(event_->createEvent(eventType.c_str(), std::to_string(bulb02_).c_str()));
-}
-void ComponentsWorker::BulbCorridorHandler()
-{
-    if (bulbCorridor_ == 0)
-    {
-        bulbCorridor_ = 1;
-        std::cout << "Lâmpada do Corredor aberta" << std::endl;
-    }
-    else if (bulbCorridor_ == 1)
-    {
-        bulbCorridor_ = 0;
-        std::cout << "Lâmpada do Corredor fechada" << std::endl;
-    }
-
-    std::string eventType = "lampada 03";
-
-    event_->sendEvent(event_->createEvent(eventType.c_str(), std::to_string(bulbCorridor_).c_str()));
-}
-void ComponentsWorker::ACHandler()
-{
-    if (AC_ == 0)
-    {
-        AC_ = 1;
-        std::cout << "Ar-condicionado ligado" << std::endl;
-    }
-    else if (AC_ == 1)
-    {
-        AC_ = 0;
-        std::cout << "Ar-condicionado desligado" << std::endl;
-    }
-
-    event_->sendEvent(event_->createEvent("ar-condicionado", std::to_string(AC_).c_str()));
-}
-void ComponentsWorker::SprinklerHandler()
-{
-    if (sprinkler_ == 0)
-    {
-        sprinkler_ = 1;
-        std::cout << "Aspersor ligado" << std::endl;
-    }
-    else if (sprinkler_ == 1)
-    {
-        sprinkler_ = 0;
-        std::cout << "Aspersor desligado" << std::endl;
-    }
-
-    event_->sendEvent(event_->createEvent("aspersor", std::to_string(sprinkler_).c_str()));
 }
 
 ComponentsWorker::~ComponentsWorker() {}

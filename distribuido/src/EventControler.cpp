@@ -51,10 +51,18 @@ void EventController::handleEvent(const char *event)
     //     cout << "Received event value: " << value->valuestring << endl;
     // }
 
-    component component = io_->getComponent(type->valuestring);
-
-    wiringPiSetup();
-    component.gpio = io_->toWiringPiPin(component.gpio);
+    component component;
+    if (std::string(type->valuestring) == "aspersor")
+    {
+        component.type = "aspersor";
+        component.tag = "Aspersor de Água (Incêndio)";
+        component.gpio = 16;
+        component.state = 0;
+    }
+    else
+    {
+        component = io_->getComponent(type->valuestring);
+    }
     pinMode(component.gpio, OUTPUT);
     if (std::string(value->valuestring) == "1")
     {
@@ -62,7 +70,7 @@ void EventController::handleEvent(const char *event)
         digitalWrite(component.gpio, HIGH);
         cout << " ✓" << endl;
         std::string confirmMessage = component.tag + " Ligado";
-        usleep(500000);
+        // usleep(500000);
         sendEvent(createEvent("confirmacao", confirmMessage.c_str()));
     }
     else if (std::string(value->valuestring) == "0")
@@ -71,7 +79,7 @@ void EventController::handleEvent(const char *event)
         digitalWrite(component.gpio, LOW);
         cout << " ✓" << endl;
         std::string confirmMessage = component.tag + " Desligado";
-        usleep(500000);
+        // usleep(500000);
         sendEvent(createEvent("confirmacao", confirmMessage.c_str()));
     }
     else

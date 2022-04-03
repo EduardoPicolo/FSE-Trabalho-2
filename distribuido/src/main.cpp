@@ -37,7 +37,7 @@ int main(int argc, char const *argv[])
         exit(1);
     }
 
-    // wiringPiSetup();
+    wiringPiSetupGpio();
 
     ServerConfig config = ServerConfig(argv[1]);
     Socket *socket = Socket::getInstance(); // Socket
