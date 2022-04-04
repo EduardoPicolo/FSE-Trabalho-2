@@ -1,5 +1,6 @@
 #include <EventController.hpp>
 #include <Socket.hpp>
+#include <sstream>
 #include <cJSON.h>
 #include <cJSON_Utils.h>
 
@@ -42,14 +43,24 @@ void EventController::handleEvent(const char *event)
 
     type = cJSON_GetObjectItemCaseSensitive(event_json, "type");
     value = cJSON_GetObjectItemCaseSensitive(event_json, "value");
-    // if (cJSON_IsString(type) && (type->valuestring != NULL))
-    // {
-    //     cout << "Received event type: " << type->valuestring << endl;
-    // }
-    // if (cJSON_IsString(value) && (value->valuestring != NULL))
-    // {
-    //     cout << "Received event value: " << value->valuestring << endl;
-    // }
+
+    bool state = std::string(value->valuestring) == "1";
+
+    if (std::string(type->valuestring) == "ligaTodos")
+    {
+        for (component component : io_->getOutputs())
+        {
+            pinMode(component.gpio, OUTPUT);
+            digitalWrite(component.gpio, state ? HIGH : LOW);
+            sendEvent(createEvent(component.type.c_str(), std::string(value->valuestring).c_str()));
+            delay(300);
+        }
+        std::string msg = state ? "ligados" : "desligados";
+        std::stringstream ss;
+        ss << "Todos os dispositivos foram " << msg << endl;
+        sendEvent(createEvent("confirmacao", ss.str().c_str()));
+        return;
+    }
 
     component component;
     if (std::string(type->valuestring) == "aspersor")
@@ -64,7 +75,7 @@ void EventController::handleEvent(const char *event)
         component = io_->getComponent(type->valuestring);
     }
     pinMode(component.gpio, OUTPUT);
-    if (std::string(value->valuestring) == "1")
+    if (state)
     {
         cout << "Turning " << component.tag << " on...";
         digitalWrite(component.gpio, HIGH);
@@ -73,7 +84,7 @@ void EventController::handleEvent(const char *event)
         // usleep(500000);
         sendEvent(createEvent("confirmacao", confirmMessage.c_str()));
     }
-    else if (std::string(value->valuestring) == "0")
+    else if (!state)
     {
         cout << "Turning " << component.tag << " off...";
         digitalWrite(component.gpio, LOW);
@@ -81,10 +92,6 @@ void EventController::handleEvent(const char *event)
         std::string confirmMessage = component.tag + " Desligado";
         // usleep(500000);
         sendEvent(createEvent("confirmacao", confirmMessage.c_str()));
-    }
-    else
-    {
-        cout << "Invalid value: " << value->valuestring << endl;
     }
 }
 

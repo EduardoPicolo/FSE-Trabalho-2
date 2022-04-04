@@ -25,6 +25,7 @@ public:
     std::vector<component> getInputs();
     std::vector<component> getOutputs();
     component getComponent(std::string type);
+    void PowerAll(bool state);
 
     // Receives a GPIO port number and translates to a WiringPI pin number
     int toWiringPiPin(int gpio);

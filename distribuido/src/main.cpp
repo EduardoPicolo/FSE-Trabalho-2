@@ -67,11 +67,6 @@ int main(int argc, char const *argv[])
 
     eventThread.join();
     dht22Thread.join();
-    // while (1)
-    // {
-    //     sleep(1);
-    //     // event->sendEvent(event->createEvent("hello", "teste"));
-    // }
 
     return 0;
 }

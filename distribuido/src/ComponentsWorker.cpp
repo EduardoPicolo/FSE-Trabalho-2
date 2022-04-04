@@ -27,7 +27,7 @@ void ComponentsWorker::start()
         component.state = initialState;
         event_->sendEvent(event_->createEvent(component.type.c_str(), std::to_string(initialState).c_str()));
         initInputWorker(component);
-        delay(1000);
+        delay(300);
         // sleep(1); // sending to many events at the same time can cause issues to the NodeJS Buffer
     }
 
@@ -38,7 +38,7 @@ void ComponentsWorker::start()
         int initialState = 0;
         component.state = initialState;
         event_->sendEvent(event_->createEvent(component.type.c_str(), std::to_string(initialState).c_str()));
-        delay(1000);
+        delay(300);
         // sleep(1); // sending to many events at the same time can cause issues to the NodeJS Buffer
     }
 }

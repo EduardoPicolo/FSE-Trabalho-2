@@ -3,12 +3,10 @@ import type { NextPage } from 'next'
 import { IoIosPeople } from 'react-icons/io'
 import { toast } from 'react-toastify'
 import {
-  Box,
   Divider,
   Flex,
   Grid,
   GridItem,
-  Progress,
   Skeleton,
   Text,
   VStack
@@ -18,7 +16,6 @@ import { Socket } from 'socket.io-client'
 
 import { DevicesPanel } from '@components/DevicesPanel'
 import { FloorSwitcher } from '@components/FloorSwitcher'
-import { Modal } from '@components/Modal'
 import { SensorsPanel } from '@components/SensorsPanel'
 import { StatsDisplay } from '@components/StatsDisplay'
 import { TemperaturePanel } from '@components/TemperaturePanel'
@@ -69,7 +66,7 @@ const Home: NextPage = () => {
         removeFloor(msg?.from)
       }
 
-      toast.info(`${msg.from} ${msg.value ? 'connected' : 'disconnected'}`)
+      toast.info(`${msg.from} ${msg.value ? 'conectado' : 'disconectado'}`)
     })
 
     socket?.on('event', (event: ServerEvent) => {
@@ -128,42 +125,20 @@ const Home: NextPage = () => {
           <VStack alignItems="flex-start" gap="12" maxWidth="600px">
             <TemperaturePanel />
 
-            <Box width="100%" style={{ marginTop: '-1rem' }}>
-              <Text
-                fontSize="smaller"
-                color="gray.500"
-                fontWeight="light"
-                textAlign="right"
-              >
-                Dispositivos \\
-              </Text>
-              <Divider borderColor="gray.50" mb={1} />
-              <DevicesPanel />
-            </Box>
+            <DevicesPanel />
 
-            <Box width="100%">
-              <Text
-                fontSize="smaller"
-                color="gray.500"
-                fontWeight="light"
-                textAlign="right"
-              >
-                Sensores \\
-              </Text>
-              <Divider borderColor="gray.50" mb={1} />
-              <SensorsPanel />
-            </Box>
+            <SensorsPanel />
           </VStack>
         </GridItem>
       </Grid>
 
-      <Modal
+      {/* <Modal
         title="Aguardando conexão..."
         isOpen={getFloors.length === 0}
         onClose={() => {}}
       >
         <Progress size="xs" colorScheme="purple" isIndeterminate />
-      </Modal>
+      </Modal> */}
     </>
   )
 }

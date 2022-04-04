@@ -2,9 +2,10 @@ import React, { useCallback, useEffect } from 'react'
 import { MdOutlineAir, MdOutlineLocalFireDepartment } from 'react-icons/md'
 import { RiLightbulbFlashLine } from 'react-icons/ri'
 import { toast } from 'react-toastify'
-import { Box, Grid, GridItem } from '@chakra-ui/react'
+import { Box, Divider, Flex, Grid, GridItem, Text } from '@chakra-ui/react'
 import get from 'lodash/get'
 
+import { PowerAllButtons } from '@components/PowerAllButtons'
 import { StatsDisplay } from '@components/StatsDisplay'
 import { SwitchDevice } from '@components/Switch'
 import { useCServer } from '@contexts/CentralServer'
@@ -56,102 +57,119 @@ export const DevicesPanel: React.FC = () => {
   )
 
   return (
-    <Grid templateColumns="1fr 1fr 1fr" gap={8}>
-      <GridItem marginBottom={4}>
-        <StatsDisplay
-          label="Ar-condicionado"
-          info={
-            <Box my={2}>
-              <SwitchDevice
-                label=""
-                isChecked={deviceStatus('AC') === true}
-                onChange={handleChange({
-                  device: 'AC',
-                  status: !deviceStatus('AC')
-                })}
-              />
-            </Box>
-          }
-          helpText={deviceStatus('AC') ? 'Ligado' : 'Desligado'}
-          icon={MdOutlineAir}
-          isLoaded={typeof deviceStatus('AC') === 'boolean'}
-        />
-      </GridItem>
+    <Box width="100%">
+      <Flex justifyContent="space-between">
+        <PowerAllButtons />
 
-      <GridItem marginBottom={4}>
-        <StatsDisplay
-          label="Lâmpada da Sala 01"
-          info={
-            <Box my={2}>
-              <SwitchDevice
-                label=""
-                isChecked={deviceStatus('bulbs.room01') === true}
-                onChange={handleChange({
-                  device: 'bulbs.room01',
-                  status: !deviceStatus('bulbs.room01')
-                })}
-              />
-            </Box>
-          }
-          helpText={statusMap(Boolean(deviceStatus('bulbs.room01')))}
-          icon={RiLightbulbFlashLine}
-          isLoaded={typeof deviceStatus('bulbs.room01') === 'boolean'}
-        />
-      </GridItem>
+        <Text
+          fontSize="smaller"
+          color="gray.500"
+          fontWeight="light"
+          textAlign="right"
+          alignSelf="flex-end"
+        >
+          Dispositivos \\
+        </Text>
+      </Flex>
+      <Divider borderColor="gray.50" mb={1} />
 
-      <GridItem marginBottom={4}>
-        <StatsDisplay
-          label="Lâmpada da Sala 02"
-          info={
-            <Box my={2}>
-              <SwitchDevice
-                label=""
-                isChecked={deviceStatus('bulbs.room02') === true}
-                onChange={handleChange({
-                  device: 'bulbs.room02',
-                  status: !deviceStatus('bulbs.room02')
-                })}
-              />
-            </Box>
-          }
-          helpText={statusMap(Boolean(deviceStatus('bulbs.room02')))}
-          icon={RiLightbulbFlashLine}
-          isLoaded={typeof deviceStatus('bulbs.room02') === 'boolean'}
-        />
-      </GridItem>
+      <Grid templateColumns="1fr 1fr 1fr" gap={8}>
+        <GridItem marginBottom={4}>
+          <StatsDisplay
+            label="Ar-condicionado"
+            info={
+              <Box my={2}>
+                <SwitchDevice
+                  label=""
+                  isChecked={deviceStatus('AC') === true}
+                  onChange={handleChange({
+                    device: 'AC',
+                    status: !deviceStatus('AC')
+                  })}
+                />
+              </Box>
+            }
+            helpText={deviceStatus('AC') ? 'Ligado' : 'Desligado'}
+            icon={MdOutlineAir}
+            isLoaded={typeof deviceStatus('AC') === 'boolean'}
+          />
+        </GridItem>
 
-      <GridItem>
-        <StatsDisplay
-          label="Lâmpadas do Corredor"
-          info={
-            <Box my={2}>
-              <SwitchDevice
-                label=""
-                isChecked={deviceStatus('bulbs.corridor') === true}
-                onChange={handleChange({
-                  device: 'bulbs.corridor',
-                  status: !deviceStatus('bulbs.corridor')
-                })}
-              />
-            </Box>
-          }
-          helpText={statusMap(Boolean(deviceStatus('bulbs.corridor')))}
-          icon={RiLightbulbFlashLine}
-          isLoaded={typeof deviceStatus('bulbs.corridor') === 'boolean'}
-        />
-      </GridItem>
+        <GridItem marginBottom={4}>
+          <StatsDisplay
+            label="Lâmpada da Sala 01"
+            info={
+              <Box my={2}>
+                <SwitchDevice
+                  label=""
+                  isChecked={deviceStatus('bulbs.room01') === true}
+                  onChange={handleChange({
+                    device: 'bulbs.room01',
+                    status: !deviceStatus('bulbs.room01')
+                  })}
+                />
+              </Box>
+            }
+            helpText={statusMap(Boolean(deviceStatus('bulbs.room01')))}
+            icon={RiLightbulbFlashLine}
+            isLoaded={typeof deviceStatus('bulbs.room01') === 'boolean'}
+          />
+        </GridItem>
 
-      <GridItem>
-        <StatsDisplay
-          label="Aspersor de Água"
-          info={deviceStatus('sprinkler') ? 'Ligado' : 'Desligado'}
-          helpText={
-            deviceStatus('sensors.smoke') ? 'Fumaça detectada' : 'Sem fumaça'
-          }
-          icon={MdOutlineLocalFireDepartment}
-          isLoaded={typeof deviceStatus('sprinkler') === 'boolean'}
-        />
-      </GridItem>
-    </Grid>
+        <GridItem marginBottom={4}>
+          <StatsDisplay
+            label="Lâmpada da Sala 02"
+            info={
+              <Box my={2}>
+                <SwitchDevice
+                  label=""
+                  isChecked={deviceStatus('bulbs.room02') === true}
+                  onChange={handleChange({
+                    device: 'bulbs.room02',
+                    status: !deviceStatus('bulbs.room02')
+                  })}
+                />
+              </Box>
+            }
+            helpText={statusMap(Boolean(deviceStatus('bulbs.room02')))}
+            icon={RiLightbulbFlashLine}
+            isLoaded={typeof deviceStatus('bulbs.room02') === 'boolean'}
+          />
+        </GridItem>
+
+        <GridItem>
+          <StatsDisplay
+            label="Lâmpadas do Corredor"
+            info={
+              <Box my={2}>
+                <SwitchDevice
+                  label=""
+                  isChecked={deviceStatus('bulbs.corridor') === true}
+                  onChange={handleChange({
+                    device: 'bulbs.corridor',
+                    status: !deviceStatus('bulbs.corridor')
+                  })}
+                />
+              </Box>
+            }
+            helpText={statusMap(Boolean(deviceStatus('bulbs.corridor')))}
+            icon={RiLightbulbFlashLine}
+            isLoaded={typeof deviceStatus('bulbs.corridor') === 'boolean'}
+          />
+        </GridItem>
+
+        <GridItem>
+          <StatsDisplay
+            label="Aspersor de Água"
+            info={deviceStatus('sprinkler') ? 'Ligado' : 'Desligado'}
+            helpText={
+              deviceStatus('sensors.smoke') ? 'Fumaça detectada' : 'Sem fumaça'
+            }
+            icon={MdOutlineLocalFireDepartment}
+            isLoaded={typeof deviceStatus('sprinkler') === 'boolean'}
+          />
+        </GridItem>
+      </Grid>
+    </Box>
   )
 }

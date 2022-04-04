@@ -164,7 +164,7 @@ export const CentralServerProvider: React.FC = ({ children }) => {
       if (payload.device === 'sensors.smoke') {
         socket?.emit?.('input-event', {
           to: payload.floor,
-          type: mapDeviceToEvent['sprinkler'], // TODO: common event type for both servers!
+          type: mapDeviceToEvent['sprinkler'],
           value: payload.status ? '1' : '0'
         })
       }

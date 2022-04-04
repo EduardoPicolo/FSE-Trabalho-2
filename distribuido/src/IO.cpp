@@ -28,6 +28,15 @@ component IO::getComponent(std::string type)
     }
 }
 
+void IO::PowerAll(bool state)
+{
+    for (component component : outputComponents_)
+    {
+        pinMode(component.gpio, OUTPUT);
+        digitalWrite(component.gpio, state);
+    }
+}
+
 int IO::toWiringPiPin(int gpio)
 {
     int pinToGpioR2[64] = {

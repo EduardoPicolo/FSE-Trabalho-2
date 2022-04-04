@@ -58,6 +58,15 @@ const SocketHandler = (req: NextApiRequest, res: ExtendedNextApiResponse) => {
             ]
             new ObjectsToCsv(log).toDisk('./log.csv', { append: true })
           })
+
+          socket.on('ligaTodos', ({ to, value }) => {
+            connectedSockets?.[to].write(
+              JSON.stringify({
+                type: 'ligaTodos',
+                value
+              })
+            )
+          })
         })
 
         // @ts-ignore
@@ -85,7 +94,7 @@ const SocketHandler = (req: NextApiRequest, res: ExtendedNextApiResponse) => {
 
             try {
               const payload = JSON.parse(data.toString()) as ServerEvent
-              console.log('PAYLOAD: ', payload)
+              console.log('RECEIVED: ', payload)
               // @ts-ignore
               if (payload.type === 'confirmacao') {
                 io.emit('confirmation', payload)
