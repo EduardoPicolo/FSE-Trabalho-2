@@ -36,17 +36,6 @@ const Home: NextPage = () => {
     socket
   } = useCServer()
 
-  //   const [totalOccupation, setTotalOccupation] = useState<number | 'pending'>(
-  //     'pending'
-  //   )
-
-  const handleFloorChange = useCallback(
-    (floor: string) => {
-      setCurrentFloor(floor)
-    },
-    [setCurrentFloor]
-  )
-
   useEffect(() => {
     if (!socket) return
     socket?.on('connect', () => {
@@ -78,6 +67,13 @@ const Home: NextPage = () => {
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socket])
+
+  const handleFloorChange = useCallback(
+    (floor: string) => {
+      setCurrentFloor(floor)
+    },
+    [setCurrentFloor]
+  )
 
   return (
     <>

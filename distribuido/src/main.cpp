@@ -29,6 +29,7 @@ void quit(int signum)
 
 int main(int argc, char const *argv[])
 {
+
     signal(SIGINT, quit);
 
     if (argc < 2)
@@ -50,8 +51,8 @@ int main(int argc, char const *argv[])
     try
     {
         socket->connectSocket("localhost", config.getAddress().port);
-        socket->sendData(config.getName().c_str()); // Identify the server after connection
-        sleep(1);                                   // Wait for the server to identify
+        socket->sendData(eventController.createEvent("identity", config.getName().c_str())); // Identify the server after connection
+        usleep(500000);                                                                      // Wait for the server to identify
     }
     catch (Exception &e)
     {

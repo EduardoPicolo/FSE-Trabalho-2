@@ -20,7 +20,6 @@ interface ExtendedNextApiResponse<T = any> extends NextApiResponse<T> {
 }
 
 const connectedSockets: Record<string, net.Socket> = {}
-const received = new MessageBuffer('\r')
 
 const SocketHandler = (req: NextApiRequest, res: ExtendedNextApiResponse) => {
   switch (req.method) {
@@ -35,12 +34,10 @@ const SocketHandler = (req: NextApiRequest, res: ExtendedNextApiResponse) => {
         }
 
         console.log('Starting Socket.io')
-        // @ts-ignore
         const io = new Server(res?.socket?.server)
 
         io.on('connection', (socket) => {
           socket.onAny((event, ...args) => {
-            // console.log(`${event}`, args[0]?.type, args[0]?.to, args[0]?.value)
             const log = [
               {
                 comando: `${Number(args[0]?.value) ? 'Liga' : 'Desliga'} ${
@@ -56,18 +53,9 @@ const SocketHandler = (req: NextApiRequest, res: ExtendedNextApiResponse) => {
           socket.on('input-event', (data) => {
             const { to, type, value } = data
 
-            connectedSockets?.[to].write(
+            connectedSockets?.[to]?.write?.(
               JSON.stringify({
                 type,
-                value
-              })
-            )
-          })
-
-          socket.on('ligaTodos', ({ to, value }) => {
-            connectedSockets?.[to].write(
-              JSON.stringify({
-                type: 'ligaTodos',
                 value
               })
             )
@@ -83,36 +71,47 @@ const SocketHandler = (req: NextApiRequest, res: ExtendedNextApiResponse) => {
         })
 
         server?.on('connection', (connection) => {
-          connection.prependOnceListener('data', (data) => {
-            console.log(data?.toString?.() + ' Connected')
-            connectedSockets[data?.toString?.()] = connection
-
-            io.emit('connection', {
-              from: data?.toString?.(),
-              type: 'connection',
-              value: 1
-            })
-          })
+          const received = new MessageBuffer('\n')
 
           connection.on('data', function (data) {
-            // console.log('Received: ' + data)
+            received.push(data)
 
-            try {
-              const payload = JSON.parse(data.toString()) as ServerEvent
-              console.log('RECEIVED: ', payload)
-              // @ts-ignore
-              if (payload.type === 'confirmacao') {
-                io.emit('confirmation', payload)
-              } else if (payload.type === 'dht') {
-                io.emit('dht', payload)
-              } else if (
-                payload.type.includes('contagemPredio') ||
-                payload.type.includes('contagemAndar')
-              ) {
-                io.emit('count', payload)
-              } else io.emit('event', payload)
-            } catch (error) {
-              console.error('Invalid event')
+            while (!received.isFinished()) {
+              const message = received.handleData()
+              console.log('RECEIVED: ', JSON.parse(message))
+              const payload = JSON.parse(message) as ServerEvent
+
+              try {
+                switch (payload.type) {
+                  case 'identity': {
+                    connectedSockets[payload.value] = connection
+                    io.emit('connection', {
+                      from: payload?.value,
+                      type: 'connection',
+                      value: 1
+                    })
+                    break
+                  }
+                  case 'dht': {
+                    io.emit('dht', payload)
+                    break
+                  }
+                  case 'confirmacao': {
+                    io.emit('confirmation', payload)
+                    break
+                  }
+                  case 'contagemPredio':
+                  case 'contagemAndar': {
+                    io.emit('count', payload)
+                    break
+                  }
+                  default:
+                    io.emit('event', payload)
+                    break
+                }
+              } catch (error) {
+                console.error('Invalid event: ', error)
+              }
             }
           })
 

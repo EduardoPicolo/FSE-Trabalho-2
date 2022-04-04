@@ -53,7 +53,7 @@ void EventController::handleEvent(const char *event)
             pinMode(component.gpio, OUTPUT);
             digitalWrite(component.gpio, state ? HIGH : LOW);
             sendEvent(createEvent(component.type.c_str(), std::string(value->valuestring).c_str()));
-            delay(200);
+            delay(50);
         }
         std::string msg = state ? "ligados" : "desligados";
         std::stringstream ss;
@@ -81,7 +81,6 @@ void EventController::handleEvent(const char *event)
         digitalWrite(component.gpio, HIGH);
         cout << " ✓" << endl;
         std::string confirmMessage = component.tag + " Ligado";
-        // usleep(500000);
         sendEvent(createEvent("confirmacao", confirmMessage.c_str()));
     }
     else if (!state)
@@ -90,7 +89,6 @@ void EventController::handleEvent(const char *event)
         digitalWrite(component.gpio, LOW);
         cout << " ✓" << endl;
         std::string confirmMessage = component.tag + " Desligado";
-        // usleep(500000);
         sendEvent(createEvent("confirmacao", confirmMessage.c_str()));
     }
 }
@@ -116,7 +114,11 @@ const char *EventController::createEvent(const char *type, const char *value)
     }
 
     char *event = NULL;
-    event = cJSON_Print(payload);
+    // event = cJSON_Print(payload);
+    event = cJSON_PrintUnformatted(payload);
+
+    event = strcat(event, "\n");
+
     if (event == NULL)
     {
         fprintf(stderr, "Failed to create event payload.\n");

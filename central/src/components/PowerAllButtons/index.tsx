@@ -10,7 +10,11 @@ export const PowerAllButtons: React.FC = () => {
   const handleClick = useCallback(
     (value: '1' | '0') => () => {
       if (!currentFloor) return
-      socket?.emit('ligaTodos', { to: currentFloor, value })
+      socket?.emit('input-event', {
+        to: currentFloor,
+        type: 'ligaTodos',
+        value
+      })
     },
     [currentFloor, socket]
   )
