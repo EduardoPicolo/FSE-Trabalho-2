@@ -55,7 +55,6 @@ const Home: NextPage = () => {
         setCurrentFloor(msg?.from)
       } else {
         removeFloor(msg?.from)
-        setCurrentFloor(getFloors?.[0] || null)
       }
 
       toast.info(`${msg.from} ${msg.value ? 'conectado' : 'disconectado'}`)
@@ -70,6 +69,12 @@ const Home: NextPage = () => {
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socket])
+
+  useEffect(() => {
+    if (!getFloors?.includes?.(currentFloor!)) {
+      setCurrentFloor(getFloors?.[0] || null)
+    }
+  }, [currentFloor, getFloors, setCurrentFloor])
 
   const handleFloorChange = useCallback(
     (floor: string) => {
