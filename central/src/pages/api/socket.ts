@@ -1,6 +1,8 @@
+import fs from 'fs'
 import net from 'net'
 
 import { NextApiRequest, NextApiResponse } from 'next'
+import ObjectsToCsv from 'objects-to-csv'
 import { Server } from 'socket.io'
 import { DefaultEventsMap } from 'socket.io/dist/typed-events'
 
@@ -24,8 +26,15 @@ const SocketHandler = (req: NextApiRequest, res: ExtendedNextApiResponse) => {
   switch (req.method) {
     case 'GET': {
       if (!res?.socket?.server?.io) {
-        console.log('Starting Socket.io')
+        try {
+          process.stdout.write('Erasing log file... ')
+          fs.writeFileSync('./log.csv', '')
+          console.log('done')
+        } catch (error) {
+          console.error(error)
+        }
 
+        console.log('Starting Socket.io')
         // @ts-ignore
         const io = new Server(res?.socket?.server)
 
@@ -39,6 +48,15 @@ const SocketHandler = (req: NextApiRequest, res: ExtendedNextApiResponse) => {
                 value
               })
             )
+
+            const log = [
+              {
+                comando: `${Number(value) ? 'Liga' : 'Desliga'} ${type}`,
+                andar: to,
+                horario: new Date().toLocaleString()
+              }
+            ]
+            new ObjectsToCsv(log).toDisk('./log.csv', { append: true })
           })
         })
 
