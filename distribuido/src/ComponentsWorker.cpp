@@ -6,9 +6,9 @@ int ComponentsWorker::smokeSensor_ = 0;
 int ComponentsWorker::window01_ = 0;
 int ComponentsWorker::window02_ = 0;
 int ComponentsWorker::door_ = 0;
-int ComponentsWorker::totalPeople_ = 0;
-int ComponentsWorker::peopleGroundFloor_ = 0;
-int ComponentsWorker::peopleFirstFloor_ = 0;
+int ComponentsWorker::totalOccupation_ = 0;
+int ComponentsWorker::totalGroundFloor_ = 0;
+int ComponentsWorker::totalFirstFloor_ = 0;
 
 ComponentsWorker::ComponentsWorker(IO *io, EventController *eventController, component dht22)
 {
@@ -69,10 +69,24 @@ void ComponentsWorker::initInputWorker(component component)
         smokeSensor_ = component.state;
         wiringPiISR(component.gpio, INT_EDGE_BOTH, SmokeSensorHandler);
     }
-    else if (component.type == "contagem")
+    else if (component.type.find("contagem") != std::string::npos)
     {
-        // return CountEnterHandler;
-        // wiringPiISR(23, INT_EDGE_BOTH, (void (*)())getComponentHandler("contagem"));
+        if (component.type.find("entrada") != std::string::npos)
+        {
+            wiringPiISR(component.gpio, INT_EDGE_RISING, CountEnterHandler);
+        }
+        else if (component.type.find("saida") != std::string::npos)
+        {
+            wiringPiISR(component.gpio, INT_EDGE_RISING, CountExitHandler);
+        }
+        else if (component.type.find("entradaAndar") != std::string::npos)
+        {
+            wiringPiISR(component.gpio, INT_EDGE_RISING, CountFloorEnterHandler);
+        }
+        else if (component.type.find("saidaAndar") != std::string::npos)
+        {
+            wiringPiISR(component.gpio, INT_EDGE_RISING, CountFloorExitHandler);
+        }
     }
     else if (component.type.find("janela") != std::string::npos)
     {
@@ -169,6 +183,47 @@ void ComponentsWorker::SmokeSensorHandler()
         std::cout << "Sensor de fumaça desligado" << std::endl;
     }
     event_->sendEvent(event_->createEvent("fumaca", std::to_string(smokeSensor_).c_str()));
+}
+
+void ComponentsWorker::CountEnterHandler()
+{
+    std::cout << "Predio: entrou 1" << std::endl;
+    totalOccupation_++;
+    totalGroundFloor_++;
+    event_->sendEvent(event_->createEvent("contagemPredio", "1"));
+    // event_->sendEvent(event_->createEvent("contagemPredio", std::to_string(totalOccupation_).c_str()));
+    // usleep(500000);
+    // event_->sendEvent(event_->createEvent("contagemTerreo", std::to_string(totalGroundFloor_).c_str()));
+}
+void ComponentsWorker::CountExitHandler()
+{
+    std::cout << "Predio: saiu 1" << std::endl;
+    totalOccupation_--;
+    totalGroundFloor_--;
+    event_->sendEvent(event_->createEvent("contagemPredio", "-1"));
+    // event_->sendEvent(event_->createEvent("contagemPredio", std::to_string(totalOccupation_).c_str()));
+    // usleep(500000);
+    // event_->sendEvent(event_->createEvent("contagemTerreo", std::to_string(totalGroundFloor_).c_str()));
+}
+void ComponentsWorker::CountFloorEnterHandler()
+{
+    std::cout << "Andar: entrou 1" << std::endl;
+    totalFirstFloor_++;
+    totalGroundFloor_--;
+    event_->sendEvent(event_->createEvent("contagemAndar", "1"));
+    // event_->sendEvent(event_->createEvent("contagemAndar", std::to_string(totalFirstFloor_).c_str()));
+    // usleep(500000);
+    // event_->sendEvent(event_->createEvent("contagemPredio", std::to_string(totalGroundFloor_).c_str()));
+}
+void ComponentsWorker::CountFloorExitHandler()
+{
+    std::cout << "Andar: saiu 1" << std::endl;
+    totalFirstFloor_--;
+    totalGroundFloor_++;
+    event_->sendEvent(event_->createEvent("contagemAndar", "-1"));
+    // event_->sendEvent(event_->createEvent("contagemAndar", std::to_string(totalFirstFloor_).c_str()));
+    // usleep(500000);
+    // event_->sendEvent(event_->createEvent("contagemTerreo", std::to_string(totalGroundFloor_).c_str()));
 }
 
 ComponentsWorker::~ComponentsWorker() {}

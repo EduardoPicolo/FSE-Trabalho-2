@@ -48,10 +48,12 @@ export type Devices = {
 
 export type FloorComponents = Devices & { sensors: Sensors } & {
   connected: boolean
-  occupation: number
+  occupation: number | 'pending'
 }
 
-export type CentralServerType = {
+export type CentralServerContextType = {
+  totalOccupation: number | 'pending'
+  updateCount: (event: ServerEvent) => void
   floors: Record<string, FloorComponents> | null
   addFloor: (floor: string) => void
   removeFloor: (floor: string) => void
@@ -64,7 +66,9 @@ export type CentralServerType = {
   socket: Socket<DefaultEventsMap, DefaultEventsMap> | null
 }
 
-export const CentralServerDefaultValues: CentralServerType = {
+export const CentralServerDefaultValues: CentralServerContextType = {
+  totalOccupation: 'pending',
+  updateCount: () => ({}),
   floors: {},
   addFloor: () => ({}),
   removeFloor: () => ({}),
@@ -79,7 +83,7 @@ export const CentralServerDefaultValues: CentralServerType = {
 
 const defaultValues: FloorComponents = {
   connected: false,
-  occupation: 0,
+  occupation: 'pending',
   AC: 'pending',
   sprinkler: 'not-connected',
   bulbs: {
@@ -102,7 +106,7 @@ const defaultValues: FloorComponents = {
   }
 }
 
-export const CentralServerContext = createContext<CentralServerType>(
+export const CentralServerContext = createContext<CentralServerContextType>(
   CentralServerDefaultValues
 )
 
@@ -110,16 +114,27 @@ export const CentralServerProvider: React.FC = ({ children }) => {
   const socket = useSocket()
 
   const [state, dispatchEvent] = useReducer(stateReducer, {
+    totalOccupation: 'pending',
     floors: {}
   })
+
+  const updateCount = useCallback((event: ServerEvent) => {
+    const payload = {
+      floor: event.from,
+      type: event.type,
+      value: event.value
+    }
+    dispatchEvent({
+      type: ACTIONS.UPDATE_OCCUPATION,
+      payload
+    })
+  }, [])
 
   const getFloors = useMemo(() => Object.keys(state.floors), [state.floors])
 
   const [currentFloor, setCurrentFloor] = useState<string | null>(
     getFloors[0] || null
   )
-
-  //   console.log('CentralServerProvider: ', state)
 
   const addFloor = useCallback((floor: string) => {
     dispatchEvent({
@@ -193,6 +208,8 @@ export const CentralServerProvider: React.FC = ({ children }) => {
 
   const value = useMemo(
     () => ({
+      totalOccupation: state.totalOccupation,
+      updateCount,
       floors: state.floors,
       getFloors,
       addFloor,
@@ -212,6 +229,8 @@ export const CentralServerProvider: React.FC = ({ children }) => {
       removeFloor,
       socket,
       state.floors,
+      state.totalOccupation,
+      updateCount,
       updateDevice,
       updateTemperature
     ]

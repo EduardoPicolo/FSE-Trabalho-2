@@ -1,8 +1,9 @@
 import invert from 'lodash/invert'
 
 export const mapEventToDevice = {
-  contagemEntra: 'sensors.countIn',
-  contagemSai: 'sensors.countOut',
+  contagemPredio: 'totalOccupation',
+  contagemTerreo: 'occupation',
+  contagemAndar: 'occupation',
   presenca: 'sensors.presence',
   fumaca: 'sensors.smoke',
   'janela 01': 'sensors.windows.room1',

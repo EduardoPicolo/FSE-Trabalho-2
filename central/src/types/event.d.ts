@@ -11,8 +11,9 @@ interface ServerEvent {
     | 'lampada 03'
     | 'ar-condicionado'
     | 'aspersor'
-    | 'contagemEntra'
-    | 'contagemSai'
+    | 'contagemPredio'
+    | 'contagemTerreo'
+    | 'contagemAndar'
     | 'dht'
   value: string
 }

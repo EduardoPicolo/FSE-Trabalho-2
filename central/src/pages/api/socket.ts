@@ -73,6 +73,11 @@ const SocketHandler = (req: NextApiRequest, res: ExtendedNextApiResponse) => {
                 io.emit('confirmation', payload)
               } else if (payload.type === 'dht') {
                 io.emit('dht', payload)
+              } else if (
+                payload.type.includes('contagemPredio') ||
+                payload.type.includes('contagemAndar')
+              ) {
+                io.emit('count', payload)
               } else io.emit('event', payload)
             } catch (error) {
               console.error('Invalid event')

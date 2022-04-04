@@ -51,6 +51,27 @@ std::vector<component> ServerConfig::getComponentsJSON(std::string componentType
 
         tempComponent.tag = tag;
         tempComponent.gpio = cJSON_GetObjectItem(data, "gpio")->valueint;
+
+        if (tempComponent.type == "contagem")
+        {
+            if (tempComponent.gpio == 13)
+            {
+                tempComponent.type += " entrada";
+            }
+            else if (tempComponent.gpio == 19)
+            {
+                tempComponent.type += " saida";
+            }
+            else if (tempComponent.gpio == 2)
+            {
+                tempComponent.type += " entradaAndar";
+            }
+            else if (tempComponent.gpio == 3)
+            {
+                tempComponent.type += " saidaAndar";
+            }
+        }
+
         tempComponent.state = 0;
 
         components.push_back(tempComponent);

@@ -34,8 +34,14 @@ const Home: NextPage = () => {
     currentFloor,
     setCurrentFloor,
     handleEvent,
+    updateCount,
+    totalOccupation,
     socket
   } = useCServer()
+
+  //   const [totalOccupation, setTotalOccupation] = useState<number | 'pending'>(
+  //     'pending'
+  //   )
 
   const handleFloorChange = useCallback(
     (floor: string) => {
@@ -69,6 +75,10 @@ const Home: NextPage = () => {
     socket?.on('event', (event: ServerEvent) => {
       handleEvent(event)
     })
+
+    socket?.on?.('count', (event: ServerEvent) => {
+      updateCount(event)
+    })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socket])
 
@@ -87,10 +97,11 @@ const Home: NextPage = () => {
             )}
             <StatsDisplay
               label="Ocupação Total"
-              info={360}
+              info={totalOccupation}
               helpText=""
               icon={IoIosPeople}
               minHeight="auto"
+              isLoaded={totalOccupation !== 'pending'}
             />
             <Skeleton
               minWidth="60px"

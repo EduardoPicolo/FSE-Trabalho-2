@@ -36,9 +36,9 @@ private:
 
     static EventController *event_;
 
-    static int totalPeople_;
-    static int peopleGroundFloor_;
-    static int peopleFirstFloor_;
+    static int totalOccupation_;
+    static int totalGroundFloor_;
+    static int totalFirstFloor_;
 
     static int presenceSensor_;
     static int smokeSensor_;
@@ -55,4 +55,6 @@ private:
 
     static void CountEnterHandler();
     static void CountExitHandler();
+    static void CountFloorEnterHandler();
+    static void CountFloorExitHandler();
 };

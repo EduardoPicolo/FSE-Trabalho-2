@@ -2,7 +2,7 @@ import { useCallback, useEffect } from 'react'
 import { BsDropletHalf } from 'react-icons/bs'
 import { IoPeopleSharp } from 'react-icons/io5'
 import { RiTempColdLine } from 'react-icons/ri'
-import { HStack } from '@chakra-ui/react'
+import { Grid, GridItem } from '@chakra-ui/react'
 import get from 'lodash/get'
 
 import { StatsDisplay } from '@components/StatsDisplay'
@@ -32,29 +32,39 @@ export const TemperaturePanel: React.FC = () => {
   )
 
   return (
-    <HStack alignItems="flex-start" gap={8}>
-      <StatsDisplay
-        label="Temperatura"
-        info={
-          <span>{(data('temperature') as number)?.toFixed?.(1)}&deg;C</span>
-        }
-        helpText=""
-        icon={RiTempColdLine}
-        isLoaded={data('temperature') !== 'pending'}
-      />
-      <StatsDisplay
-        label="Umidade"
-        info={<span>{(data('humidity') as number)?.toFixed?.(1)}%</span>}
-        helpText=""
-        icon={BsDropletHalf}
-        isLoaded={data('humidity') !== 'pending'}
-      />
-      <StatsDisplay
-        label="Ocupação"
-        info={36}
-        helpText=""
-        icon={IoPeopleSharp}
-      />
-    </HStack>
+    <Grid templateColumns="1fr auto 1fr" gap={8}>
+      <GridItem minWidth="171px">
+        <StatsDisplay
+          label="Temperatura"
+          info={
+            <span>{(data('temperature') as number)?.toFixed?.(1)}&deg;C</span>
+          }
+          helpText=""
+          icon={RiTempColdLine}
+          isLoaded={data('temperature') !== 'pending'}
+        />
+      </GridItem>
+      <GridItem minWidth="171px">
+        <StatsDisplay
+          label="Umidade"
+          info={<span>{(data('humidity') as number)?.toFixed?.(1)}%</span>}
+          helpText=""
+          icon={BsDropletHalf}
+          isLoaded={data('humidity') !== 'pending'}
+        />
+      </GridItem>
+      <GridItem minWidth="171px">
+        <StatsDisplay
+          label={currentFloor ? `Ocupação do ${currentFloor}` : 'Ocupação'}
+          info={currentFloor && floors?.[currentFloor]?.occupation}
+          helpText=""
+          icon={IoPeopleSharp}
+          isLoaded={
+            Boolean(currentFloor) &&
+            floors?.[currentFloor!]?.occupation !== 'pending'
+          }
+        />
+      </GridItem>
+    </Grid>
   )
 }
