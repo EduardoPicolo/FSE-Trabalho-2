@@ -35,3 +35,9 @@ terreo:
 
 primeiro:
 	./bin/bin configuracao_andar_1.json
+
+terreo_local:
+	./bin/bin configuracao_andar_terreo_local.json
+
+primeiro_local:
+	./bin/bin configuracao_andar_1_local.json

@@ -55,6 +55,7 @@ const Home: NextPage = () => {
         setCurrentFloor(msg?.from)
       } else {
         removeFloor(msg?.from)
+        setCurrentFloor(getFloors?.[0] || null)
       }
 
       toast.info(`${msg.from} ${msg.value ? 'conectado' : 'disconectado'}`)

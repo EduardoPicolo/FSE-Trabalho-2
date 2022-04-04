@@ -114,16 +114,12 @@ export const CentralServerProvider: React.FC = ({ children }) => {
     })
   }, [])
 
-  const removeFloor = useCallback(
-    (floor: string) => {
-      dispatchEvent({
-        type: ACTIONS.REMOVE_FLOOR,
-        payload: floor
-      })
-      setCurrentFloor(Object.keys(state?.floors)?.[0] || null)
-    },
-    [state.floors]
-  )
+  const removeFloor = useCallback((floor: string) => {
+    dispatchEvent({
+      type: ACTIONS.REMOVE_FLOOR,
+      payload: floor
+    })
+  }, [])
 
   const updateDevice = useCallback(
     (payload: UpdateDeviceAction['payload']) => {
