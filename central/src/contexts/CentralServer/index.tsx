@@ -6,6 +6,7 @@ import React, {
   useReducer,
   useState
 } from 'react'
+import { toast } from 'react-toastify'
 import cloneDeep from 'lodash/cloneDeep'
 import type { DefaultEventsMap } from 'socket.io/dist/typed-events'
 import { Socket } from 'socket.io-client'
@@ -48,11 +49,11 @@ export type Devices = {
 
 export type FloorComponents = Devices & { sensors: Sensors } & {
   connected: boolean
-  occupation: number | 'pending'
 }
 
 export type CentralServerContextType = {
-  totalOccupation: number | 'pending'
+  totalOccupancy: number | 'pending'
+  occupancy: Record<string, number>
   updateCount: (event: ServerEvent) => void
   floors: Record<string, FloorComponents> | null
   addFloor: (floor: string) => void
@@ -67,7 +68,8 @@ export type CentralServerContextType = {
 }
 
 export const CentralServerDefaultValues: CentralServerContextType = {
-  totalOccupation: 'pending',
+  totalOccupancy: 0,
+  occupancy: {},
   updateCount: () => ({}),
   floors: {},
   addFloor: () => ({}),
@@ -83,7 +85,6 @@ export const CentralServerDefaultValues: CentralServerContextType = {
 
 const defaultValues: FloorComponents = {
   connected: false,
-  occupation: 'pending',
   AC: 'pending',
   sprinkler: 'not-connected',
   bulbs: {
@@ -114,19 +115,19 @@ export const CentralServerProvider: React.FC = ({ children }) => {
   const socket = useSocket()
 
   const [state, dispatchEvent] = useReducer(stateReducer, {
-    totalOccupation: 'pending',
+    totalOccupancy: 0,
+    occupancy: {},
     floors: {}
   })
 
   const updateCount = useCallback((event: ServerEvent) => {
-    const payload = {
-      floor: event.from,
-      type: event.type,
-      value: event.value
-    }
     dispatchEvent({
       type: ACTIONS.UPDATE_OCCUPATION,
-      payload
+      payload: {
+        floor: event.from,
+        type: event.type,
+        value: event.value
+      }
     })
   }, [])
 
@@ -168,6 +169,17 @@ export const CentralServerProvider: React.FC = ({ children }) => {
           value: payload.status ? '1' : '0'
         })
       }
+
+      if (payload?.device?.includes?.('sensor') && payload?.status) {
+        toast.warning(
+          `Sensor ${mapDeviceToEvent[payload.device]} Ativado no ${
+            payload.floor
+          }`,
+          {
+            theme: 'colored'
+          }
+        )
+      }
     },
     [socket]
   )
@@ -208,7 +220,8 @@ export const CentralServerProvider: React.FC = ({ children }) => {
 
   const value = useMemo(
     () => ({
-      totalOccupation: state.totalOccupation,
+      totalOccupancy: state.totalOccupancy,
+      occupancy: state.occupancy,
       updateCount,
       floors: state.floors,
       getFloors,
@@ -229,7 +242,8 @@ export const CentralServerProvider: React.FC = ({ children }) => {
       removeFloor,
       socket,
       state.floors,
-      state.totalOccupation,
+      state.occupancy,
+      state.totalOccupancy,
       updateCount,
       updateDevice,
       updateTemperature

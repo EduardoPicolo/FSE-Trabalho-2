@@ -7,6 +7,7 @@ import {
   Flex,
   Grid,
   GridItem,
+  Progress,
   Skeleton,
   Text,
   VStack
@@ -16,6 +17,7 @@ import { Socket } from 'socket.io-client'
 
 import { DevicesPanel } from '@components/DevicesPanel'
 import { FloorSwitcher } from '@components/FloorSwitcher'
+import { Modal } from '@components/Modal'
 import { SensorsPanel } from '@components/SensorsPanel'
 import { StatsDisplay } from '@components/StatsDisplay'
 import { TemperaturePanel } from '@components/TemperaturePanel'
@@ -32,7 +34,7 @@ const Home: NextPage = () => {
     setCurrentFloor,
     handleEvent,
     updateCount,
-    totalOccupation,
+    totalOccupancy,
     socket
   } = useCServer()
 
@@ -90,11 +92,11 @@ const Home: NextPage = () => {
             )}
             <StatsDisplay
               label="Ocupação Total"
-              info={totalOccupation}
+              info={totalOccupancy}
               helpText=""
               icon={IoIosPeople}
               minHeight="auto"
-              isLoaded={totalOccupation !== 'pending'}
+              isLoaded={totalOccupancy !== 'pending'}
             />
             <Skeleton
               minWidth="60px"
@@ -114,7 +116,7 @@ const Home: NextPage = () => {
               </Text>
             </Skeleton>
           </Flex>
-          <Divider borderColor="gray.50" mt={0} />
+          <Divider borderColor="gray.50" mt={0.5} />
         </GridItem>
 
         <GridItem>
@@ -128,13 +130,13 @@ const Home: NextPage = () => {
         </GridItem>
       </Grid>
 
-      {/* <Modal
+      <Modal
         title="Aguardando conexão..."
         isOpen={getFloors.length === 0}
         onClose={() => {}}
       >
         <Progress size="xs" colorScheme="purple" isIndeterminate />
-      </Modal> */}
+      </Modal>
     </>
   )
 }

@@ -57,7 +57,7 @@ export const DevicesPanel: React.FC = () => {
   )
 
   return (
-    <Box width="100%">
+    <Box width="100%" style={{ marginTop: '-0.5rem' }}>
       <Flex justifyContent="space-between">
         <PowerAllButtons />
 

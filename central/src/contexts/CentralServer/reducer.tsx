@@ -11,8 +11,9 @@ export enum ACTIONS {
 }
 
 type State = {
-  totalOccupation: number | 'pending'
   floors: Record<string, FloorComponents>
+  totalOccupancy: number | 'pending'
+  occupancy: Record<string, number>
 }
 
 type Action = {
@@ -48,16 +49,22 @@ export const stateReducer = (state: State, action: Action): State => {
   switch (action.type) {
     case ACTIONS.ADD_FLOOR:
       return {
-        totalOccupation: state.totalOccupation,
+        totalOccupancy: state.totalOccupancy,
+        occupancy: {
+          ...state.occupancy,
+          [Object?.keys?.(action.payload)?.[0]]: 0
+        },
         floors: { ...state?.floors, ...action?.payload }
       }
       break
 
     case ACTIONS.REMOVE_FLOOR:
       delete state?.floors?.[action?.payload]
+      delete state?.occupancy?.[action?.payload]
 
       return {
-        totalOccupation: state.totalOccupation,
+        totalOccupancy: state.totalOccupancy,
+        occupancy: state.occupancy,
         floors: { ...state?.floors }
       }
       break
@@ -73,7 +80,8 @@ export const stateReducer = (state: State, action: Action): State => {
       const updatedFloor = set(state.floors?.[floor], device, status)
 
       return {
-        totalOccupation: state.totalOccupation,
+        totalOccupancy: state.totalOccupancy,
+        occupancy: state.occupancy,
         floors: { ...state?.floors, [floor]: updatedFloor }
       }
       break
@@ -90,7 +98,8 @@ export const stateReducer = (state: State, action: Action): State => {
       }
 
       return {
-        totalOccupation: state.totalOccupation,
+        totalOccupancy: state.totalOccupancy,
+        occupancy: state.occupancy,
         floors: { ...state?.floors, [floor]: updatedFloor }
       }
       break
@@ -98,67 +107,57 @@ export const stateReducer = (state: State, action: Action): State => {
 
     case ACTIONS.UPDATE_OCCUPATION: {
       const { floor, type, value } = action.payload as UpdateCountPayload
-      console.log('UPDATE OCCUPATION', floor, type, value)
+      console.log('UPDATE occupancy', floor, type, value)
 
-      let totalOccupation = state.totalOccupation
+      let totalOccupancy = state.totalOccupancy
+      let occupancy = state.occupancy?.[floor]
 
       if (type === 'contagemPredio') {
-        if (state.totalOccupation === 'pending' && Number(value) === 1) {
-          totalOccupation = 1
-        } else if (
-          state.totalOccupation === 'pending' &&
-          Number(value) === -1
-        ) {
-          totalOccupation = 0
-        } else if (state.totalOccupation === 0 && Number(value) === -1) {
-          totalOccupation = 0
+        if (state.totalOccupancy === 0 && Number(value) === -1) {
+          totalOccupancy = 0
         } else {
-          totalOccupation = (state.totalOccupation as number) + Number(value)
+          totalOccupancy = (state.totalOccupancy as number) + Number(value)
+        }
+
+        if (occupancy === 0 && Number(value) === -1) {
+          occupancy = 0
+        } else occupancy = occupancy + Number(value)
+
+        return {
+          totalOccupancy,
+          occupancy: { ...state.occupancy, [floor]: occupancy },
+          floors: state?.floors
         }
       }
 
-      let floorOccupation = state.floors?.[floor]?.occupation
-      console.log('floorOccupation: ', floorOccupation)
-      if (floorOccupation === 'pending') {
-        floorOccupation = Number(value) === 1 ? 1 : 0
-      } else if (floorOccupation === 0 && Number(value) === -1) {
-        floorOccupation = 0
-      } else floorOccupation = (floorOccupation as number) + Number(value)
-
-      const updatedFloor = set(
-        state.floors?.[floor],
-        'occupation',
-        floorOccupation
-      )
-
-      let updatedTerreoCount = state.floors?.['Térreo']?.occupation
-
       if (type === 'contagemAndar') {
+        let count = state.occupancy?.[floor] || 0
+        let updatedTerreoCount = state.occupancy?.['Térreo']
+
         if (Number(value) === 1)
           updatedTerreoCount = (updatedTerreoCount as number) - 1
         else if (Number(value) === -1)
           updatedTerreoCount = (updatedTerreoCount as number) + 1
 
-        const updatedTerreo = set(
-          state.floors?.['Térreo'],
-          'occupation',
-          updatedTerreoCount
-        )
+        if (count === 0 && Number(value) === -1) {
+          count = 0
+        } else {
+          count = (count as number) + Number(value)
+        }
 
         return {
-          totalOccupation,
-          floors: {
-            ...state?.floors,
-            [floor]: updatedFloor,
-            Térreo: updatedTerreo
-          }
+          totalOccupancy,
+          occupancy: {
+            ...state.occupancy,
+            Térreo: updatedTerreoCount,
+            [floor]: count
+          },
+          floors: state?.floors
         }
       }
 
-      return {
-        totalOccupation,
-        floors: { ...state?.floors, [floor]: updatedFloor }
-      }
+      return state
+
       break
     }
 

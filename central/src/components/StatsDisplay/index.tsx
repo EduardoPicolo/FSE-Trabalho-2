@@ -33,7 +33,7 @@ export const StatsDisplay: React.FC<StatsDisplayProps> = ({
         <StatNumber>
           <Flex alignItems="center">
             <Icon as={icon} boxSize="26px" mr={1} fill="url(#svg-gradient)" />
-            {info ?? 'Não informado'}
+            {info}
           </Flex>
         </StatNumber>
         <StatHelpText marginBottom={0}>{helpText || ''}</StatHelpText>

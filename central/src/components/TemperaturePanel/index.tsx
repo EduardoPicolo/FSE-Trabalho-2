@@ -9,7 +9,8 @@ import { StatsDisplay } from '@components/StatsDisplay'
 import { FloorComponents, useCServer } from '@contexts/CentralServer'
 
 export const TemperaturePanel: React.FC = () => {
-  const { socket, currentFloor, floors, updateTemperature } = useCServer()
+  const { socket, currentFloor, floors, occupancy, updateTemperature } =
+    useCServer()
 
   useEffect(() => {
     if (!socket) return
@@ -56,13 +57,12 @@ export const TemperaturePanel: React.FC = () => {
       <GridItem minWidth="171px">
         <StatsDisplay
           label={currentFloor ? `Ocupação do ${currentFloor}` : 'Ocupação'}
-          info={currentFloor && floors?.[currentFloor]?.occupation}
+          info={currentFloor && occupancy?.[currentFloor]}
           helpText=""
           icon={IoPeopleSharp}
-          isLoaded={
-            Boolean(currentFloor) &&
-            floors?.[currentFloor!]?.occupation !== 'pending'
-          }
+          isLoaded={Boolean(
+            currentFloor && typeof occupancy?.[currentFloor] === 'number'
+          )}
         />
       </GridItem>
     </Grid>
