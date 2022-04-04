@@ -19,7 +19,7 @@ export const PowerAllButtons: React.FC = () => {
     <HStack>
       <Tooltip
         hasArrow
-        label="Ligar tudo"
+        label={`Ligar todos do ${currentFloor}`}
         placement="top"
         closeOnClick={false}
         bg="blackAlpha.300"
@@ -32,11 +32,12 @@ export const PowerAllButtons: React.FC = () => {
           aria-label="Turn all on"
           icon={<MdOutlinePower size={22} />}
           variant="ghost"
+          disabled={!currentFloor}
         />
       </Tooltip>
       <Tooltip
         hasArrow
-        label="Desligar tudo"
+        label={`Desligar todos do ${currentFloor}`}
         placement="top"
         closeOnClick={false}
         bg="blackAlpha.300"
@@ -49,6 +50,7 @@ export const PowerAllButtons: React.FC = () => {
           aria-label="Turn all off"
           icon={<MdOutlinePowerOff size={22} />}
           variant="ghost"
+          disabled={!currentFloor}
         />
       </Tooltip>
     </HStack>

@@ -39,6 +39,20 @@ const SocketHandler = (req: NextApiRequest, res: ExtendedNextApiResponse) => {
         const io = new Server(res?.socket?.server)
 
         io.on('connection', (socket) => {
+          socket.onAny((event, ...args) => {
+            // console.log(`${event}`, args[0]?.type, args[0]?.to, args[0]?.value)
+            const log = [
+              {
+                comando: `${Number(args[0]?.value) ? 'Liga' : 'Desliga'} ${
+                  args[0]?.type ?? 'todos'
+                }`,
+                andar: args[0]?.to,
+                horario: new Date().toLocaleString()
+              }
+            ]
+            new ObjectsToCsv(log).toDisk('./log.csv', { append: true })
+          })
+
           socket.on('input-event', (data) => {
             const { to, type, value } = data
 
@@ -48,15 +62,6 @@ const SocketHandler = (req: NextApiRequest, res: ExtendedNextApiResponse) => {
                 value
               })
             )
-
-            const log = [
-              {
-                comando: `${Number(value) ? 'Liga' : 'Desliga'} ${type}`,
-                andar: to,
-                horario: new Date().toLocaleString()
-              }
-            ]
-            new ObjectsToCsv(log).toDisk('./log.csv', { append: true })
           })
 
           socket.on('ligaTodos', ({ to, value }) => {

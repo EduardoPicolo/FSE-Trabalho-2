@@ -53,7 +53,7 @@ void EventController::handleEvent(const char *event)
             pinMode(component.gpio, OUTPUT);
             digitalWrite(component.gpio, state ? HIGH : LOW);
             sendEvent(createEvent(component.type.c_str(), std::string(value->valuestring).c_str()));
-            delay(300);
+            delay(200);
         }
         std::string msg = state ? "ligados" : "desligados";
         std::stringstream ss;
