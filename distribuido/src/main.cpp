@@ -50,7 +50,7 @@ int main(int argc, char const *argv[])
 
     try
     {
-        socket->connectSocket("localhost", config.getAddress().port);
+        socket->connectSocket(config.getAddress().ip.c_str(), config.getAddress().port);
         socket->sendData(eventController.createEvent("identity", config.getName().c_str())); // Identify the server after connection
         usleep(500000);                                                                      // Wait for the server to identify
     }

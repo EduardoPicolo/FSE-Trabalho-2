@@ -65,10 +65,15 @@ const SocketHandler = (req: NextApiRequest, res: ExtendedNextApiResponse) => {
         // @ts-ignore
         res?.socket.server.io = io
 
+        console.log(process.env.NODE_ENV)
         const server = net.createServer()
-        server?.listen(10049, function () {
-          console.log('Socket is listening on port 10049')
-        })
+        server?.listen(
+          10049,
+          process.env.NODE_ENV === 'development' ? 'localhost' : '192.168.0.53',
+          () => {
+            console.log('Socket.io listening on port 10049')
+          }
+        )
 
         server?.on('connection', (connection) => {
           const received = new MessageBuffer('\n')
