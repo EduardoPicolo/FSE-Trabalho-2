@@ -71,20 +71,24 @@ void ComponentsWorker::initInputWorker(component component)
     }
     else if (component.type.find("contagem") != std::string::npos)
     {
-        if (component.type.find("entrada") != std::string::npos)
+        if (component.type.find("entradaPredio") != std::string::npos)
         {
+            std::cout << "entradaPredio" << std::endl;
             wiringPiISR(component.gpio, INT_EDGE_RISING, CountEnterHandler);
         }
-        else if (component.type.find("saida") != std::string::npos)
+        else if (component.type.find("saidaPredio") != std::string::npos)
         {
+            std::cout << "saidaPredio" << std::endl;
             wiringPiISR(component.gpio, INT_EDGE_RISING, CountExitHandler);
         }
         else if (component.type.find("entradaAndar") != std::string::npos)
         {
+            std::cout << "entradaAndar" << std::endl;
             wiringPiISR(component.gpio, INT_EDGE_RISING, CountFloorEnterHandler);
         }
         else if (component.type.find("saidaAndar") != std::string::npos)
         {
+            std::cout << "saidaAndar" << std::endl;
             wiringPiISR(component.gpio, INT_EDGE_RISING, CountFloorExitHandler);
         }
     }

@@ -56,11 +56,11 @@ std::vector<component> ServerConfig::getComponentsJSON(std::string componentType
         {
             if (tempComponent.gpio == 13)
             {
-                tempComponent.type += " entrada";
+                tempComponent.type += " entradaPredio";
             }
             else if (tempComponent.gpio == 19)
             {
-                tempComponent.type += " saida";
+                tempComponent.type += " saidaPredio";
             }
             else if (tempComponent.gpio == 2)
             {

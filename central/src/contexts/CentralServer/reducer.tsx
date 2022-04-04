@@ -131,6 +131,30 @@ export const stateReducer = (state: State, action: Action): State => {
         floorOccupation
       )
 
+      let updatedTerreoCount = state.floors?.['Térreo']?.occupation
+
+      if (type === 'contagemAndar') {
+        if (Number(value) === 1)
+          updatedTerreoCount = (updatedTerreoCount as number) - 1
+        else if (Number(value) === -1)
+          updatedTerreoCount = (updatedTerreoCount as number) + 1
+
+        const updatedTerreo = set(
+          state.floors?.['Térreo'],
+          'occupation',
+          updatedTerreoCount
+        )
+
+        return {
+          totalOccupation,
+          floors: {
+            ...state?.floors,
+            [floor]: updatedFloor,
+            Térreo: updatedTerreo
+          }
+        }
+      }
+
       return {
         totalOccupation,
         floors: { ...state?.floors, [floor]: updatedFloor }
