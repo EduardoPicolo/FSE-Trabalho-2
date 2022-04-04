@@ -26,7 +26,7 @@
       "jsx": true
     },
     "sourceType": "module",
-    "project": "./central/tsconfig.json"
+    "project": "./tsconfig.json"
   },
   "plugins": [
     "@typescript-eslint",

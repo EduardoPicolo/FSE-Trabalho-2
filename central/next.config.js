@@ -7,7 +7,16 @@ const nextConfig = (phase, { defaultConfig }) => ({
   compiler: {
     styledComponents: true
   },
-  swcMinify: true
+  swcMinify: true,
+  experimental: {
+    outputStandalone: true
+  },
+  typescript: {
+    ignoreBuildErrors: true
+  },
+  eslint: {
+    ignoreDuringBuilds: true
+  }
 })
 
 module.exports = nextConfig

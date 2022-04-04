@@ -27,7 +27,7 @@ const SocketHandler = (req: NextApiRequest, res: ExtendedNextApiResponse) => {
       if (!res?.socket?.server?.io) {
         try {
           process.stdout.write('Erasing log file... ')
-          fs.writeFileSync('./log.csv', '')
+          fs.writeFileSync('./static/log.csv', '')
           console.log('done')
         } catch (error) {
           console.error(error)
@@ -47,7 +47,7 @@ const SocketHandler = (req: NextApiRequest, res: ExtendedNextApiResponse) => {
                 horario: new Date().toLocaleString()
               }
             ]
-            new ObjectsToCsv(log).toDisk('./log.csv', { append: true })
+            new ObjectsToCsv(log).toDisk('./static/log.csv', { append: true })
           })
 
           socket.on('input-event', (data) => {
