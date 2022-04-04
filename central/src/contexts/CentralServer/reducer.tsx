@@ -1,7 +1,5 @@
 import { set } from 'lodash'
 
-import type { FloorComponents } from '.'
-
 export enum ACTIONS {
   ADD_FLOOR = 'ADD_FLOOR',
   REMOVE_FLOOR = 'REMOVE_FLOOR',

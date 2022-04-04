@@ -6,7 +6,7 @@ import { Grid, GridItem } from '@chakra-ui/react'
 import get from 'lodash/get'
 
 import { StatsDisplay } from '@components/StatsDisplay'
-import { FloorComponents, useCServer } from '@contexts/CentralServer'
+import { useCServer } from '@contexts/CentralServer'
 
 export const TemperaturePanel: React.FC = () => {
   const { socket, currentFloor, floors, occupancy, updateTemperature } =

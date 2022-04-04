@@ -21,34 +21,28 @@ import {
 } from './reducer'
 import { mapDeviceToEvent, mapEventToDevice } from './utils'
 
-type Status = 'pending' | boolean | 'not-connected'
-
-export type Sensors = {
-  countIn: Status
-  countOut: Status
-  temperature: Status | number
-  humidity: Status | number
-  presence: Status
-  smoke: Status
-  door: Status
-  windows: {
-    room1: Status
-    room2: Status
-  }
-}
-
-export type Devices = {
-  AC: Status
+const floorDefaultValues: FloorComponents = {
+  connected: false,
+  AC: 'pending',
+  sprinkler: 'not-connected',
   bulbs: {
-    room01: Status
-    room02: Status
-    corridor: Status
+    room01: 'pending',
+    room02: 'pending',
+    corridor: 'pending'
+  },
+  sensors: {
+    temperature: 'pending',
+    humidity: 'pending',
+    countIn: 'pending',
+    countOut: 'pending',
+    presence: 'pending',
+    smoke: 'pending',
+    door: 'not-connected',
+    windows: {
+      room1: 'pending',
+      room2: 'pending'
+    }
   }
-  sprinkler: Status
-}
-
-export type FloorComponents = Devices & { sensors: Sensors } & {
-  connected: boolean
 }
 
 export type CentralServerContextType = {
@@ -81,30 +75,6 @@ export const CentralServerDefaultValues: CentralServerContextType = {
   updateTemperature: () => ({}),
   handleEvent: () => ({}),
   socket: null
-}
-
-const defaultValues: FloorComponents = {
-  connected: false,
-  AC: 'pending',
-  sprinkler: 'not-connected',
-  bulbs: {
-    room01: 'pending',
-    room02: 'pending',
-    corridor: 'pending'
-  },
-  sensors: {
-    temperature: 'pending',
-    humidity: 'pending',
-    countIn: 'pending',
-    countOut: 'pending',
-    presence: 'pending',
-    smoke: 'pending',
-    door: 'not-connected',
-    windows: {
-      room1: 'pending',
-      room2: 'pending'
-    }
-  }
 }
 
 export const CentralServerContext = createContext<CentralServerContextType>(
@@ -140,7 +110,7 @@ export const CentralServerProvider: React.FC = ({ children }) => {
   const addFloor = useCallback((floor: string) => {
     dispatchEvent({
       type: ACTIONS.ADD_FLOOR,
-      payload: { [floor]: cloneDeep(defaultValues) }
+      payload: { [floor]: cloneDeep(floorDefaultValues) }
     })
   }, [])
 
@@ -169,18 +139,8 @@ export const CentralServerProvider: React.FC = ({ children }) => {
           value: payload.status ? '1' : '0'
         })
       }
-
-      if (payload?.device?.includes?.('sensor') && payload?.status) {
-        toast.warning(
-          `Sensor ${mapDeviceToEvent[payload.device]} Ativado no ${
-            payload.floor
-          }`,
-          {
-            theme: 'colored'
-          }
-        )
-      }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [socket]
   )
 
@@ -195,6 +155,19 @@ export const CentralServerProvider: React.FC = ({ children }) => {
       }
 
       updateDevice(payload)
+
+      if (payload?.device?.includes?.('sensor') && payload?.status) {
+        toast.warning(
+          `Sensor ${mapDeviceToEvent[payload.device]} Ativado no ${
+            payload.floor
+          }`,
+          {
+            theme: 'colored'
+          }
+        )
+        const audio = new Audio('/sound/alert.wav')
+        audio.play()
+      }
     },
     [updateDevice]
   )
