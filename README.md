@@ -12,19 +12,45 @@ Este trabalho tem por objetivo a criação de um sistema distribuído de automa�
 
 ## Execução
 
-### Para executar o projeto **localmente** execute os seguintes comandos:
+Para executar o projeto com o **Servidor Central** rodando **localmante** (caso o docker não rode na rasp 43)
 
-#### 1. Abra um tunnel ssh
+#### Execute os seguintes comandos:
 
+#### 1. Inicie o Servidor Central localmente
+
+Com yarn
+
+```
+yarn install
+yarn dev
+```
+
+ou Com docker
+
+```
+docker build -t nextjs-docker .
+docker run -v `pwd`:/www/static -p 3000:3000 -p 10049:10049 nextjs-docker
+```
+
+Navegue para Servidor Central que estará rodando em `localhost:3000`
+
+#### 2. Abra um tunel ssh
+
+Para que os Servidores Distribuidos possam se comunicar da rasp42 com o Central rodando na sua maquina, execute-os através de um tunel ssh.
+
+Entre na rasp42 atrevés do tunel
+
+```
 ssh -R 10049:localhost:10049 < rasp42 >
+```
 
-#### 1. Compile o servidor distribuido
+#### 3. Compile o servidor distribuido na rasp 42
 
 ```
 make
 ```
 
-#### 2. Execute
+#### 4. Execute
 
 Para servidor do terreo:
 
@@ -40,16 +66,33 @@ make primeiro_local
 
 ---
 
-### Para executar o projeto na rasp execute os seguintes comandos:
+Para executar o projeto na rasp execute os seguintes comandos:
 
-#### 1. Compile o servidor distribuido
+#### 1. Inicie o Servidor Central
+
+Com docker
 
 ```
-cd distribuido
+docker build -t nextjs-docker .
+docker run -v `pwd`:/www/static -p 3000:3000 -p 10049:10049 nextjs-docker
+```
+
+ou
+
+```
+yarn build
+yarn start
+```
+
+Abra o Servidor Central no navegador
+
+#### 2. Compile o servidor distribuido
+
+```
 make
 ```
 
-#### 2. Execute
+#### 3. Execute
 
 Para servidor do terreo:
 
@@ -57,7 +100,7 @@ Para servidor do terreo:
 make terreo
 ```
 
-Para servidor 1oAndar:
+Para servidor do 1oAndar:
 
 ```
 make primeiro
