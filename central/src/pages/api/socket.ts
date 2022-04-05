@@ -67,11 +67,24 @@ const SocketHandler = (req: NextApiRequest, res: ExtendedNextApiResponse) => {
 
         console.log(process.env.NODE_ENV)
         const server = net.createServer()
+
+        server.on('error', (e) => {
+          if (e?.code === 'EADDRNOTAVAIL') {
+            console.log('Address not available, retrying...')
+            setTimeout(() => {
+              server.close()
+              server.listen(10049, 'localhost', () => {
+                console.log('Socket listening on port localhost:10049')
+              })
+            }, 1000)
+          }
+        })
+
         server?.listen(
           10049,
           process.env.NODE_ENV === 'development' ? 'localhost' : '192.168.0.53',
           () => {
-            console.log('Socket.io listening on port 10049')
+            console.log('Socket listening on port 10049')
           }
         )
 
